@@ -256,8 +256,8 @@ function fmt(s){ if (!s) return '-'; var d = new Date(s); return isNaN(d.getTime
 function today(){ var d = new Date(); var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dd < 10 ? '0' : '') + dd; }
 
 var ROLES = {
-  employee: {name:'員工', tabs:[['profile','員工資料'],['work','工作回報'],['document','文件呈交'],['sales','每日業績'],['ops','回報營運狀況'],['photo','上傳班表照片'],['myscore','我的積分'],['appeal','積分申訴'],['support','跨店支援申請']]},
-  manager: {name:'主管', tabs:[['workInbox','工作審核中心'],['docInbox','文件審核中心'],['salesAnalysis','節慶天氣業績分析'],['inbox','既有待辦審核'],['dash','積分總覽'],['scoreevt','登錄積分事件'],['schedule','班表確認'],['support','跨店支援申請'],['ops','回報營運狀況']]}
+  employee: {name:'員工', tabs:[['profile','員工資料'],['work','工作回報'],['document','文件呈交'],['sales','每日業績'],['ops','回報營運狀況'],['photo','上傳班表照片'],['myscore','我的積分'],['appeal','積分申訴']]},
+  manager: {name:'主管', tabs:[['workInbox','工作審核中心'],['docInbox','文件審核中心'],['salesAnalysis','節慶天氣業績分析'],['inbox','既有待辦審核'],['dash','積分總覽'],['scoreevt','登錄積分事件'],['schedule','班表確認'],['ops','回報營運狀況']]}
 };
 var FIELDS = ['myId','myStore','hName','hValue','bUser','bPass'];
 var state = {role:null};
@@ -606,9 +606,29 @@ async function reviewV10Record(btn){
  var r=await api('aom-v09-manager-action',{method:'POST',json:{record_id:id,reviewer_id:reviewer,decision:decision,review_note:note}});if(!r.ok){msg('wiMsg','err',r.error);return;}await loadV10WorkInbox();msg('wiMsg','ok','審核結果已更新。');
 }
 async function loadV10DocInbox(){
- clearMsg('diMsg');$('diOut').innerHTML='<p class="sub">載入中…</p>';var r=await api('aom-v07-document-inbox',{auth:'basic'});if(!r.ok){$('diOut').innerHTML='';msg('diMsg','err',r.error);return;}
- var d=r.data||{},rows=d.pending_documents||[];
- $('diOut').innerHTML='<div class="stats"><div class="stat">文件總數<b>'+esc(d.total||0)+'</b></div><div class="stat">待審文件<b>'+esc(d.pending_count||0)+'</b></div></div>'+(rows.map(function(x){return '<div class="item"><div class="t">'+esc(x.title)+' <span class="badge b-medium">待審核</span></div><div class="sub">'+esc(x.document_type)+'｜員工 '+esc(x.employee_id)+'｜'+fmt(x.submitted_at)+'</div><details><summary>檢視文件內容</summary>'+(String(x.content||'').startsWith('data:')?'<a download="'+esc(x.file_name||x.title||'employee-file')+'" href="'+x.content+'">下載／檢視附件檔案</a>':'<pre class="data">'+esc(x.content)+'</pre>')+'</details><input id="docnote_'+esc(x.document_id)+'" placeholder="審核意見／退件原因" style="margin-top:8px"><button class="small green" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="approve">核准</button><button class="small red" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="reject">退件</button></div>';}).join('')||'<p class="sub">目前沒有待審文件。</p>');
+ clearMsg('diMsg');$('diOut').innerHTML='<p class="sub">載入中…</p>';
+ var r=await api('aom-v07-document-inbox',{auth:'basic'});
+ if(!r.ok){$('diOut').innerHTML='';msg('diMsg','err',r.error);return;}
+ var d=r.data||{},rows=d.pending_documents||[],completed=d.completed_documents||[];
+ var pendingHtml=rows.map(function(x){
+  var content=String(x.content||'');
+  var attachment=content.startsWith('data:')?'<a download="'+esc(x.file_name||x.title||'employee-file')+'" href="'+content+'">下載／檢視附件檔案</a>':'<pre class="data">'+esc(content)+'</pre>';
+  return '<div class="item"><div class="t">'+esc(x.title)+' <span class="badge b-medium">待審核</span></div><div class="sub">'+esc(x.document_type)+'｜員工 '+esc(x.employee_id)+'｜'+fmt(x.submitted_at)+'</div><details><summary>檢視文件內容</summary>'+attachment+'</details><input id="docnote_'+esc(x.document_id)+'" placeholder="審核意見／退件原因" style="margin-top:8px"><button class="small green" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="approve">核准</button><button class="small red" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="reject">退件</button></div>';
+ }).join('');
+ function csvCell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+ var head=['日期','門市','員工姓名','員工編號','職務','開始時間','結束時間','狀態','辨識信心','備註'];
+ var packages=completed.filter(function(x){return x.document_type==='schedule_package';});
+ var filesHtml=packages.map(function(x){
+  var p={};try{p=JSON.parse(x.content||'{}')}catch(e){}
+  var group={};(p.rows||[]).forEach(function(z){var key=z.employee_id||z.employee_name||'未識別';(group[key]||(group[key]=[])).push(z);});
+  function makeCsv(list){return '\\uFEFF'+[head].concat(list.map(function(z){return [p.schedule_date,p.store_name,z.employee_name,z.employee_id,z.role,z.shift_start,z.shift_end,z.status,Math.round((z.confidence||0)*100)+'%',z.notes];})).map(function(a){return a.map(csvCell).join(',')}).join('\\r\\n');}
+  var html='<div class="item"><b>'+esc(x.title)+'</b><div class="sub">主管班表檔案｜員工 '+esc(x.employee_id)+'｜'+fmt(x.submitted_at)+'</div>';
+  Object.keys(group).forEach(function(key){var csv=makeCsv(group[key]);var href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);html+='<a download="'+esc('個人班表_'+key+'_'+(p.schedule_date||'日期未辨識')+'.csv')+'" href="'+href+'">下載 '+esc(key)+' 個人班表</a><br>';});
+  var merged='data:text/csv;charset=utf-8,'+encodeURIComponent(makeCsv(p.rows||[]));
+  html+='<a download="'+esc('全體員工合併班表_'+(p.schedule_date||'日期未辨識')+'.csv')+'" href="'+merged+'">下載全體員工合併班表</a></div>';
+  return html;
+ }).join('');
+ $('diOut').innerHTML='<div class="stats"><div class="stat">文件總數<b>'+esc(d.total||0)+'</b></div><div class="stat">待審文件<b>'+esc(d.pending_count||0)+'</b></div><div class="stat">已完成文件<b>'+esc(completed.length)+'</b></div></div><h3>待審文件</h3>'+(pendingHtml||'<p class="sub">目前沒有待審文件。</p>')+'<h3>主管班表檔案（個人班表＋全體合併班表）</h3>'+(filesHtml||'<p class="sub">目前尚無班表檔案。</p>');
 }
 async function reviewV10Doc(btn){
  var id=btn.getAttribute('data-id'),decision=btn.getAttribute('data-d'),reviewer=$('myId').value.trim(),note=$('docnote_'+id).value.trim();if(!reviewer){msg('diMsg','err','請填寫主管編號後重新登入。');return;}if(decision==='reject'&&!note){msg('diMsg','err','退件時請填寫退件原因。');return;}
@@ -660,6 +680,3 @@ if (state.role && $('hValue').value) enterApp();
 </script>
 </body>
 </html>
- var packages=(d.completed_documents||[]).filter(function(x){return x.document_type==='schedule_package';});
- var filesHtml=packages.map(function(x){var p={};try{p=JSON.parse(x.content||'{}')}catch(e){};function cell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}var head=['日期','門市','員工姓名','員工編號','職務','開始時間','結束時間','狀態','辨識信心','備註'];var groups={};(p.rows||[]).forEach(function(r){var k=r.employee_id||r.employee_name||'未識別';(groups[k]||(groups[k]=[])).push(r);});var out='<div class="item"><b>'+esc(x.title)+'</b><div class="sub">主管班表檔案｜'+fmt(x.submitted_at)+'</div>';Object.keys(groups).forEach(function(k){var csv='\\uFEFF'+[head].concat(groups[k].map(function(r){return [p.schedule_date,p.store_name,r.employee_name,r.employee_id,r.role,r.shift_start,r.shift_end,r.status,Math.round((r.confidence||0)*100)+'%',r.notes]})).map(function(a){return a.map(cell).join(',')}).join('\\r\\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='個人班表_'+k+'.csv';a.textContent='下載 '+k+' 個人班表';a.style.display='block';out+=a.outerHTML;});var merged='\\uFEFF'+[head].concat((p.rows||[]).map(function(r){return [p.schedule_date,p.store_name,r.employee_name,r.employee_id,r.role,r.shift_start,r.shift_end,r.status,Math.round((r.confidence||0)*100)+'%',r.notes]})).map(function(a){return a.map(cell).join(',')}).join('\\r\\n');var m=document.createElement('a');m.href=URL.createObjectURL(new Blob([merged],{type:'text/csv;charset=utf-8'}));m.download='全體員工合併班表_'+(p.schedule_date||'日期未辨識')+'.csv';m.textContent='下載全體員工合併班表';m.style.display='block';out+=m.outerHTML+'</div>';return out;}).join('');
- $('diOut').innerHTML+='<h3>主管班表檔案（個人班表＋全體合併班表）</h3>'+(filesHtml||'<p class="sub">目前尚無班表檔案。</p>');
