@@ -128,7 +128,7 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 </div>
 
 <div class="pane card" id="pane-appeal">
-<h2>積分申訴</h2>
+<h2>積分申訴／跨店支援</h2>
 <p class="sub">對某一筆加扣分有疑問時提出，主管會在待辦審核中處理。</p>
 <div class="grid">
 <div><label>員工編號</label><input id="apEmp"></div>
@@ -138,10 +138,7 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 <textarea id="apReason"></textarea>
 <button data-act="appeal">送出申訴</button>
 <div class="msg" id="apMsg"></div>
-</div>
-
-<div class="pane card" id="pane-support">
-<h2>跨店支援申請</h2>
+<h3>跨店支援登記</h3>
 <div class="grid">
 <div><label>員工編號</label><input id="spEmp"></div>
 <div><label>申請門市</label><input id="spFrom"></div>
@@ -152,7 +149,7 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 </div>
 <label class="chk"><input type="checkbox" id="spConsent">員工本人已明確同意前往支援</label>
 <button data-act="support">送出申請</button>
-<div class="msg" id="spMsg"></div>
+<div class="msg" id="spMsg"></div><h3>我的支援統計</h3><button class="gray small" data-act="supportStats">查詢支援次數與時數</button><div class="msg" id="spStatsMsg"></div><div id="spStatsOut"></div>
 </div>
 
 <div class="pane card" id="pane-inbox">
@@ -197,20 +194,21 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 
 
 <div class="pane card" id="pane-profile">
-<h2>員工資料建立／更新</h2><p class="sub">建立員工基本檔案；員工編號會自動帶入登入編號。</p>
+<h2>員工資料建立／更新</h2><p class="sub">可直接拍攝或掃描員工資料，檔案會隨員工資料一併呈交主管留存。</p>
 <div class="grid">
 <div><label>員工編號</label><input id="pfId"></div><div><label>姓名</label><input id="pfName" placeholder="請輸入姓名"></div>
+<div><label>員工資料掃描／拍照檔案</label><input id="pfFile" type="file" accept="image/*,.pdf"></div>
 <div><label>門市代號</label><input id="pfStore"></div><div><label>職稱</label><input id="pfTitle" placeholder="例如：門市人員"></div>
 <div><label>電話</label><input id="pfPhone"></div><div><label>Email</label><input id="pfEmail" type="email"></div>
 <div><label>到職日期</label><input id="pfHire" type="date"></div><div><label>在職狀態</label><select id="pfStatus"><option value="active">在職</option><option value="inactive">停職／暫停</option><option value="resigned">離職</option></select></div>
-</div><label>備註</label><textarea id="pfNotes"></textarea><button data-act="profile">儲存員工資料</button><div class="msg" id="pfMsg"></div>
+</div><label>備註</label><textarea id="pfNotes"></textarea><button data-act="profile">儲存員工資料與掃描檔</button><div class="msg" id="pfMsg"></div>
 </div>
 
 <div class="pane card" id="pane-work">
-<h2>工作任務／交接／巡查／異常回報</h2>
+<h2>工作任務／交接／異常回報</h2>
 <p class="sub">選擇回報類型並填寫內容；需要主管處理的項目會進入工作審核中心。</p>
 <div class="grid">
-<div><label>回報類型</label><select id="wkModule"><option value="daily_task">每日工作任務</option><option value="handover">工作交接</option><option value="incident">異常事件</option><option value="store_inspection">門市巡查</option><option value="leave_request">請假申請</option><option value="shift_request">排班／調班申請</option><option value="training">教育訓練</option><option value="inventory">庫存紀錄</option><option value="equipment">設備紀錄</option><option value="payroll_bonus">薪資／獎金資料登錄</option><option value="audit_log">稽核紀錄</option></select></div>
+<div><label>回報類型</label><select id="wkModule"><option value="daily_task">每日工作任務</option><option value="handover">工作交接</option><option value="incident">異常事件</option><option value="leave_request">請假申請</option><option value="shift_request">排班／調班申請</option><option value="inventory">庫存紀錄</option><option value="equipment">設備紀錄</option></select></div>
 <div><label>門市代號</label><input id="wkStore"></div><div><label>標題</label><input id="wkTitle" placeholder="例如：晚班交接、冷藏櫃異常"></div><div><label>期限（選填）</label><input id="wkDue" type="datetime-local"></div>
 </div><label>詳細內容</label><textarea id="wkDesc" placeholder="請描述工作內容、處理情況、需要協助事項或申請原因"></textarea>
 <button data-act="work">送出工作回報</button><div class="msg" id="wkMsg"></div>
@@ -224,10 +222,10 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 </div>
 
 <div class="pane card" id="pane-sales">
-<h2>每日業績與天氣／節慶紀錄</h2><div class="grid">
+<h2>每日業績與節慶紀錄</h2><div class="grid">
 <div><label>日期</label><input id="slDate" type="date"></div><div><label>門市代號</label><input id="slStore"></div><div><label>當日營業額（元）</label><input id="slAmount" type="number" min="0" step="1"></div>
-<div><label>天氣</label><select id="slWeather"><option>晴天</option><option>陰天</option><option>雨天</option><option>高溫</option><option>低溫</option><option>颱風／豪雨</option><option>unknown</option></select></div>
-<div><label>氣溫（°C）</label><input id="slTemp" type="number" step="0.1"></div><div><label>降雨量（mm）</label><input id="slRain" type="number" min="0" step="0.1"></div>
+<div><label>天氣</label><select id="slWeather"><option>晴天</option><option>陰天</option><option>雨天</option><option>颱風／豪雨</option><option>unknown</option></select></div>
+
 <div><label>節慶／特殊日</label><input id="slFestival" placeholder="例如：中秋節、連假、無"></div><div><label>促銷活動</label><input id="slCampaign" placeholder="例如：會員日、滿額折扣、無"></div>
 </div><button data-act="sales">送出每日業績紀錄</button><div class="msg" id="slMsg"></div>
 </div>
@@ -403,7 +401,7 @@ async function doPhoto(){
   clearMsg('photoMsg'); $('photoOut').innerHTML = '';
   var f = $('photoFile').files[0];
   if (!f) { msg('photoMsg','err','請先選擇照片'); return; }
-  var fd = new FormData(); fd.append('schedule_image', f);
+  var fd = new FormData(); fd.append('schedule_image', f); fd.append('employee_id', $('myId').value.trim());
   var st = $('photoStore').value.trim(); if (st) fd.append('target_store_id', st);
   msg('photoMsg','info','辨識中，約需 10 到 30 秒，請稍候…');
   var r = await api('aom-v07-schedule-photo', {method:'POST', form:fd});
@@ -414,6 +412,14 @@ async function doPhoto(){
   var rows = (d.rows || []).map(function(x){ return '<tr><td>' + esc(x.employee_name) + '</td><td>' + esc(x.employee_id || '-') + '</td><td>' + esc(x.shift_start || '-') + ' – ' + esc(x.shift_end || '-') + '</td><td>' + esc(stx[x.status] || x.status) + '</td><td>' + Math.round((x.confidence || 0) * 100) + '%</td><td>' + esc(x.notes || '') + '</td></tr>'; }).join('');
   var unread = (d.unreadable_items || []);
   $('photoOut').innerHTML = '<p class="sub" style="margin-top:12px">日期：' + esc(d.schedule_date || '未辨識') + '｜門市：' + esc(d.recognized_store || '未辨識') + '</p><table><thead><tr><th>姓名</th><th>編號</th><th>時段</th><th>狀態</th><th>信心</th><th>備註</th></tr></thead><tbody>' + (rows || '<tr><td colspan="6">沒有辨識到資料</td></tr>') + '</tbody></table>' + (unread.length ? '<p class="sub">無法辨識：' + esc(unread.join('、')) + '</p>' : '');
+  function csvCell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+  var head=['日期','門市','員工姓名','員工編號','職務','開始時間','結束時間','狀態','辨識信心','備註'];
+  var allCsv='\\uFEFF'+[head].concat((d.rows||[]).map(function(x){return [d.schedule_date,d.recognized_store,x.employee_name,x.employee_id,x.role,x.shift_start,x.shift_end,x.status,Math.round((x.confidence||0)*100)+'%',x.notes]})).map(function(r){return r.map(csvCell).join(',')}).join('\\r\\n');
+  var links='<div class="item"><b>班表檔案</b><p class="sub">已產生個人班表 CSV 與全體合併班表 CSV，可用 Excel 開啟。</p>';
+  var groups={};(d.rows||[]).forEach(function(x){var k=x.employee_id||x.employee_name||'未識別';(groups[k]||(groups[k]=[])).push(x);});
+  Object.keys(groups).forEach(function(k){var rows=groups[k].map(function(x){return [d.schedule_date,d.recognized_store,x.employee_name,x.employee_id,x.role,x.shift_start,x.shift_end,x.status,Math.round((x.confidence||0)*100)+'%',x.notes]});var csv='\\uFEFF'+[head].concat(rows).map(function(r){return r.map(csvCell).join(',')}).join('\\r\\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='個人班表_'+k+'_'+(d.schedule_date||'日期未辨識')+'.csv';a.textContent='下載 '+k+' 個人班表';a.style.display='block';links+=a.outerHTML;});
+  var merged=document.createElement('a');merged.href=URL.createObjectURL(new Blob([allCsv],{type:'text/csv;charset=utf-8'}));merged.download='全體員工合併班表_'+(d.schedule_date||'日期未辨識')+'.csv';merged.textContent='下載全體員工合併班表';merged.style.display='block';links+=merged.outerHTML+'</div>';
+  $('photoOut').innerHTML += links;
 }
 
 async function doMyScore(){
@@ -450,6 +456,16 @@ async function doSupport(){
   if (!r.ok) { msg('spMsg','err',r.error); return; }
   msg('spMsg','ok','申請已送出（編號 ' + r.data.request_id + '），等待主管審核。');
   $('spConsent').checked = false;
+}
+
+
+async function loadSupportStats(){
+ clearMsg('spStatsMsg');$('spStatsOut').innerHTML='載入中…';
+ var emp=$('myId').value.trim();if(!emp){msg('spStatsMsg','err','請先登入員工編號。');return;}
+ var r=await api('aom-v10-my-support-stats',{auth:'basic',query:'employee_id='+encodeURIComponent(emp)});
+ if(!r.ok){$('spStatsOut').innerHTML='';msg('spStatsMsg','err',r.error);return;}
+ var d=r.data||{};
+ $('spStatsOut').innerHTML='<div class="stats"><div class="stat">已核准支援次數<b>'+esc(d.completed_count||0)+'</b></div><div class="stat">核准支援時數<b>'+esc(d.completed_hours||0)+'</b></div><div class="stat">待主管確認<b>'+esc(d.pending_count||0)+'</b></div></div>';
 }
 
 function reviewCard(x, title, lines){
@@ -541,7 +557,15 @@ function setDefaultsV10(){
 async function doProfile(){
  clearMsg('pfMsg');var b={employee_id:$('pfId').value.trim(),full_name:$('pfName').value.trim(),store_id:$('pfStore').value.trim(),job_title:$('pfTitle').value.trim(),phone:$('pfPhone').value.trim(),email:$('pfEmail').value.trim(),hire_date:$('pfHire').value,status:$('pfStatus').value,notes:$('pfNotes').value.trim()};
  if(!b.employee_id||!b.full_name){msg('pfMsg','err','員工編號與姓名為必填。');return;}
- var r=await api('aom-v07-employee-profile',{method:'POST',json:b});if(!r.ok){msg('pfMsg','err',r.error);return;}msg('pfMsg','ok','員工資料已建立／更新：'+b.employee_id);
+ var r=await api('aom-v07-employee-profile',{method:'POST',json:b});if(!r.ok){msg('pfMsg','err',r.error);return;}
+ var f=$('pfFile').files[0];
+ if(f){
+  if(f.size>6000000){msg('pfMsg','err','掃描檔請控制在 6MB 以內。員工基本資料已儲存，請縮小檔案後再補傳。');return;}
+  var dataUrl=await new Promise(function(resolve,reject){var rd=new FileReader();rd.onload=function(){resolve(rd.result)};rd.onerror=reject;rd.readAsDataURL(f);});
+  var dr=await api('aom-v07-employee-document-submit',{method:'POST',json:{employee_id:b.employee_id,document_type:'employee_profile_scan',title:'員工資料掃描檔｜'+f.name,content:dataUrl,file_name:f.name,mime_type:f.type||'application/octet-stream'}});
+  if(!dr.ok){msg('pfMsg','err','基本資料已儲存，但掃描檔呈交失敗：'+dr.error);return;}
+  msg('pfMsg','ok','員工資料已建立／更新，掃描檔已呈交主管審核。');
+ }else msg('pfMsg','ok','員工資料已建立／更新：'+b.employee_id+'（未附掃描檔）');
 }
 async function doWork(){
  clearMsg('wkMsg');var module=$('wkModule').value,title=$('wkTitle').value.trim(),employee_id=$('myId').value.trim(),store_id=$('wkStore').value.trim();
@@ -560,7 +584,7 @@ async function doDocument(){
 async function doSales(){
  clearMsg('slMsg');var emp=$('myId').value.trim(),store=$('slStore').value.trim(),sales=Number($('slAmount').value),date=$('slDate').value;
  if(!emp||!store||!date||$('slAmount').value===''||!Number.isFinite(sales)||sales<0){msg('slMsg','err','請填寫員工編號、門市、日期及有效營業額。');return;}
- var p={date:date,sales:sales,weather:$('slWeather').value,temp_c:$('slTemp').value===''?null:Number($('slTemp').value),rainfall_mm:$('slRain').value===''?null:Number($('slRain').value),festival:$('slFestival').value.trim()||'無',campaign:$('slCampaign').value.trim()||'無'};
+ var p={date:date, sales:sales, weather:$('slWeather').value, festival:$('slFestival').value.trim()||'無',campaign:$('slCampaign').value.trim()||'無'};
  var r=await api('aom-v09-record-submit',{method:'POST',json:{module:'sales_daily',employee_id:emp,store_id:store,title:'每日營業額 '+date,payload:p}});
  if(!r.ok){msg('slMsg','err',r.error);return;}msg('slMsg','ok','每日業績已記錄，編號：'+(r.data.record_id||'已建立'));$('slAmount').value='';
 }
@@ -584,7 +608,7 @@ async function reviewV10Record(btn){
 async function loadV10DocInbox(){
  clearMsg('diMsg');$('diOut').innerHTML='<p class="sub">載入中…</p>';var r=await api('aom-v07-document-inbox',{auth:'basic'});if(!r.ok){$('diOut').innerHTML='';msg('diMsg','err',r.error);return;}
  var d=r.data||{},rows=d.pending_documents||[];
- $('diOut').innerHTML='<div class="stats"><div class="stat">文件總數<b>'+esc(d.total||0)+'</b></div><div class="stat">待審文件<b>'+esc(d.pending_count||0)+'</b></div></div>'+(rows.map(function(x){return '<div class="item"><div class="t">'+esc(x.title)+' <span class="badge b-medium">待審核</span></div><div class="sub">'+esc(x.document_type)+'｜員工 '+esc(x.employee_id)+'｜'+fmt(x.submitted_at)+'</div><details><summary>檢視文件內容</summary><pre class="data">'+esc(x.content)+'</pre></details><input id="docnote_'+esc(x.document_id)+'" placeholder="審核意見／退件原因" style="margin-top:8px"><button class="small green" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="approve">核准</button><button class="small red" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="reject">退件</button></div>';}).join('')||'<p class="sub">目前沒有待審文件。</p>');
+ $('diOut').innerHTML='<div class="stats"><div class="stat">文件總數<b>'+esc(d.total||0)+'</b></div><div class="stat">待審文件<b>'+esc(d.pending_count||0)+'</b></div></div>'+(rows.map(function(x){return '<div class="item"><div class="t">'+esc(x.title)+' <span class="badge b-medium">待審核</span></div><div class="sub">'+esc(x.document_type)+'｜員工 '+esc(x.employee_id)+'｜'+fmt(x.submitted_at)+'</div><details><summary>檢視文件內容</summary>'+(String(x.content||'').startsWith('data:')?'<a download="'+esc(x.file_name||x.title||'employee-file')+'" href="'+x.content+'">下載／檢視附件檔案</a>':'<pre class="data">'+esc(x.content)+'</pre>')+'</details><input id="docnote_'+esc(x.document_id)+'" placeholder="審核意見／退件原因" style="margin-top:8px"><button class="small green" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="approve">核准</button><button class="small red" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="reject">退件</button></div>';}).join('')||'<p class="sub">目前沒有待審文件。</p>');
 }
 async function reviewV10Doc(btn){
  var id=btn.getAttribute('data-id'),decision=btn.getAttribute('data-d'),reviewer=$('myId').value.trim(),note=$('docnote_'+id).value.trim();if(!reviewer){msg('diMsg','err','請填寫主管編號後重新登入。');return;}if(decision==='reject'&&!note){msg('diMsg','err','退件時請填寫退件原因。');return;}
@@ -618,7 +642,7 @@ document.addEventListener('click', function(ev){
   if (a === 'decide') { busyRun(function(){ return decide(el); }, el); return; }
   if (a === 'v9review') { busyRun(function(){ return reviewV10Record(el); }, el); return; }
   if (a === 'docreview') { busyRun(function(){ return reviewV10Doc(el); }, el); return; }
-  var map = {ops:doOps, photo:doPhoto, myscore:doMyScore, appeal:doAppeal, support:doSupport, inbox:loadInbox, dash:loadDash, scoreevt:doScoreEvt, schedule:doSchedule, profile:doProfile, work:doWork, document:doDocument, sales:doSales, workInbox:loadV10WorkInbox, docInbox:loadV10DocInbox, salesAnalysis:loadV10SalesAnalysis};
+  var map = {ops:doOps, photo:doPhoto, myscore:doMyScore, appeal:doAppeal, support:doSupport, supportStats:loadSupportStats, inbox:loadInbox, dash:loadDash, scoreevt:doScoreEvt, schedule:doSchedule, profile:doProfile, work:doWork, document:doDocument, sales:doSales, workInbox:loadV10WorkInbox, docInbox:loadV10DocInbox, salesAnalysis:loadV10SalesAnalysis};
   if (map[a]) busyRun(map[a], el);
 });
 
@@ -636,3 +660,6 @@ if (state.role && $('hValue').value) enterApp();
 </script>
 </body>
 </html>
+ var packages=(d.completed_documents||[]).filter(function(x){return x.document_type==='schedule_package';});
+ var filesHtml=packages.map(function(x){var p={};try{p=JSON.parse(x.content||'{}')}catch(e){};function cell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}var head=['日期','門市','員工姓名','員工編號','職務','開始時間','結束時間','狀態','辨識信心','備註'];var groups={};(p.rows||[]).forEach(function(r){var k=r.employee_id||r.employee_name||'未識別';(groups[k]||(groups[k]=[])).push(r);});var out='<div class="item"><b>'+esc(x.title)+'</b><div class="sub">主管班表檔案｜'+fmt(x.submitted_at)+'</div>';Object.keys(groups).forEach(function(k){var csv='\\uFEFF'+[head].concat(groups[k].map(function(r){return [p.schedule_date,p.store_name,r.employee_name,r.employee_id,r.role,r.shift_start,r.shift_end,r.status,Math.round((r.confidence||0)*100)+'%',r.notes]})).map(function(a){return a.map(cell).join(',')}).join('\\r\\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='個人班表_'+k+'.csv';a.textContent='下載 '+k+' 個人班表';a.style.display='block';out+=a.outerHTML;});var merged='\\uFEFF'+[head].concat((p.rows||[]).map(function(r){return [p.schedule_date,p.store_name,r.employee_name,r.employee_id,r.role,r.shift_start,r.shift_end,r.status,Math.round((r.confidence||0)*100)+'%',r.notes]})).map(function(a){return a.map(cell).join(',')}).join('\\r\\n');var m=document.createElement('a');m.href=URL.createObjectURL(new Blob([merged],{type:'text/csv;charset=utf-8'}));m.download='全體員工合併班表_'+(p.schedule_date||'日期未辨識')+'.csv';m.textContent='下載全體員工合併班表';m.style.display='block';out+=m.outerHTML+'</div>';return out;}).join('');
+ $('diOut').innerHTML+='<h3>主管班表檔案（個人班表＋全體合併班表）</h3>'+(filesHtml||'<p class="sub">目前尚無班表檔案。</p>');
