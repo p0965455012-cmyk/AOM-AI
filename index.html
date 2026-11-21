@@ -1,134 +1,638 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AOM 2.0 數據測試控制台</title>
-  <style>
-    body { font-family: -apple-system, sans-serif; padding: 16px; max-width: 650px; margin: auto; background: #f5f5f7; color: #1d1d1f; }
-    .card { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-    h2 { margin-top: 0; font-size: 20px; }
-    h3 { font-size: 15px; margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 1px solid #e5e5ea; color: #007aff; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    label { display: block; margin-top: 10px; font-weight: 600; font-size: 13px; color: #3a3a3c; }
-    input, select, textarea { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #d1d1d6; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-    button { margin-top: 20px; width: 100%; padding: 14px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    button:active { background: #005bb5; }
-    pre { background: #1e1e1e; color: #4af626; padding: 15px; border-radius: 10px; overflow-x: auto; font-size: 13px; margin-top: 18px; line-height: 1.4; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AOM 無人主管系統</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;background:#f3f5f9;color:#1f2937;font-size:15px}
+header{background:#1e3a8a;color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+header h1{margin:0;font-size:18px}
+header .who{font-size:13px;opacity:.9}
+main{max-width:960px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{background:#e2e8f0;color:#1e293b;border:0;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;margin:0}
+.tab.on{background:#1e3a8a;color:#fff}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:17px}
+h3{font-size:15px;margin:16px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label{display:block;font-size:13px;color:#475569;margin-bottom:4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;font-family:inherit;background:#fff}
+textarea{min-height:90px}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;margin:8px 0;color:#1f2937}
+.chk input{width:auto}
+button{background:#1e3a8a;color:#fff;border:0;border-radius:8px;padding:10px 18px;font-size:15px;cursor:pointer;margin-top:10px;margin-right:6px}
+button.gray{background:#64748b}
+button.green{background:#059669}
+button.red{background:#dc2626}
+button.small{padding:6px 12px;font-size:13px;margin-top:6px}
+button:disabled{opacity:.5}
+.msg{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:14px;display:none}
+.msg.ok{display:block;background:#d1fae5;color:#065f46}
+.msg.err{display:block;background:#fee2e2;color:#991b1b}
+.msg.info{display:block;background:#e0e7ff;color:#3730a3}
+.pane{display:none}
+.pane.on{display:block}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:6px}
+.role{border:2px solid #cbd5e1;border-radius:10px;padding:12px;cursor:pointer;background:#fff;text-align:left;color:#1f2937;margin:0}
+.role.on{border-color:#1e3a8a;background:#eef2ff}
+.role b{display:block;font-size:16px}
+.role span{font-size:12px;color:#64748b}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
+th{background:#f1f5f9}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#e2e8f0;font-weight:normal}
+.b-critical{background:#fee2e2;color:#991b1b}
+.b-high{background:#ffedd5;color:#9a3412}
+.b-medium{background:#fef9c3;color:#854d0e}
+.b-normal{background:#d1fae5;color:#065f46}
+.big{font-size:42px;font-weight:700;margin:6px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.stat{background:#f8fafc;border-radius:10px;padding:10px 12px;font-size:13px;color:#475569}
+.stat b{display:block;font-size:24px;color:#1f2937}
+.item{border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:10px}
+.item .t{font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:#64748b}
+.shift{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:6px}
+.shift button{margin:0}
+.note{font-size:12px;color:#64748b;margin-top:10px}
+ul{padding-left:20px;margin:6px 0}
+.hide{display:none}
+pre.data{white-space:pre-wrap;overflow-wrap:anywhere;background:#f8fafc;padding:10px;border-radius:8px;font-size:12px;max-height:260px;overflow:auto}
+details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
+</style>
 </head>
 <body>
-  <div class="card">
-    <h2>AOM 2.0 營運數據測試控制台</h2>
-    
-    <h3>1. 基礎識別資訊</h3>
-    <div class="grid">
-      <div>
-        <label>租戶代碼 (tenant_id)</label>
-        <input type="text" id="tenant_id" value="STORE001">
-      </div>
-      <div>
-        <label>分店代碼 (store_id)</label>
-        <input type="text" id="store_id" value="BRANCH001">
-      </div>
-      <div>
-        <label>模組代碼 (module_id)</label>
-        <input type="text" id="module_id" value="M01">
-      </div>
-      <div>
-        <label>操作者 (requested_by)</label>
-        <input type="text" id="requested_by" value="admin">
-      </div>
-    </div>
+<header>
+<h1>AOM 無人主管系統</h1>
+<div class="who" id="who"></div>
+<div id="hdrBtns" class="hide"><button class="small gray" data-act="logout">切換身分 / 登出</button></div>
+</header>
+<main>
 
-    <label>事件類型 (event_type)</label>
-    <select id="event_type">
-      <option value="query">query (營運數據查詢分析)</option>
-      <option value="action">action (執行調整動作)</option>
-      <option value="alert">alert (異常高風險通報)</option>
-    </select>
+<section id="login" class="card">
+<h2>登入</h2>
+<p class="sub">請輸入系統管理員提供的連線金鑰。金鑰只保存在這個瀏覽器分頁，關閉分頁後需重新輸入。</p>
+<label>選擇身分</label>
+<div class="roles">
+<button type="button" class="role" data-role="employee"><b>員工</b><span>回報營運、上傳班表、查詢積分、申訴及跨店支援</span></button>
+<button type="button" class="role" data-role="manager"><b>主管</b><span>審核、積分總覽、排班</span></button>
+</div>
+<div class="grid" style="margin-top:12px">
+<div><label>我的編號（員工或主管編號）</label><input id="myId" placeholder="例如 E001 或 M001" autocomplete="off"></div>
+<div><label>門市代號</label><input id="myStore" placeholder="例如 store-001" autocomplete="off"></div>
+<div><label>金鑰名稱（Header）</label><input id="hName" autocomplete="off"></div>
+<div><label>金鑰值（Header）</label><input id="hValue" type="password" autocomplete="off"></div>
+<div><label>查詢帳號（員工、主管需要）</label><input id="bUser" autocomplete="off"></div>
+<div><label>查詢密碼（員工、主管需要）</label><input id="bPass" type="password" autocomplete="off"></div>
+</div>
+<button data-act="login">進入系統</button>
+<div class="msg" id="loginMsg"></div>
+</section>
 
-    <h3>2. 營運數值測試資料 (Payload)</h3>
-    <div class="grid">
-      <div>
-        <label>今日實際營收 (元)</label>
-        <input type="number" id="revenue" value="42000">
-      </div>
-      <div>
-        <label>今日目標營收 (元)</label>
-        <input type="number" id="target_revenue" value="50000">
-      </div>
-      <div>
-        <label>核心商品庫存量 (件)</label>
-        <input type="number" id="inventory" value="8">
-      </div>
-      <div>
-        <label>安全庫存警戒線 (件)</label>
-        <input type="number" id="safety_stock" value="15">
-      </div>
-    </div>
+<section id="app" class="hide">
+<div class="tabs" id="tabs"></div>
 
-    <label>分析問題或備註 (question)</label>
-    <textarea id="question" rows="2">請分析今日營收達成率與庫存異常狀況</textarea>
+<div class="pane card" id="pane-ops">
+<h2>回報營運狀況</h2>
+<div class="grid">
+<div><label>門市代號</label><input id="opsStore"></div>
+<div><label>事件類型</label><select id="opsType"><option value="complaint">客訴</option><option value="wait_time">等候時間過長</option><option value="equipment">設備狀況</option><option value="staffing">人力狀況</option><option value="sales">營收回報</option></select></div>
+</div>
+<div id="opsFields" class="grid" style="margin-top:10px"></div>
+<button data-act="ops">送出回報</button>
+<div class="msg" id="opsMsg"></div>
+<div id="opsOut"></div>
+</div>
 
-    <label>額外自訂 JSON 資料 (選填，可自由新增其他欄位)</label>
-    <textarea id="extra_json" rows="2">{"promo_active": true, "weather": "rainy"}</textarea>
+<div class="pane card" id="pane-photo">
+<h2>上傳班表照片</h2>
+<p class="sub">拍下紙本班表上傳，AI 會辨識成表格；辨識結果請人工確認。</p>
+<div class="grid">
+<div><label>班表照片</label><input type="file" id="photoFile" accept="image/*"></div>
+<div><label>門市代號</label><input id="photoStore"></div>
+</div>
+<button data-act="photo">上傳並辨識</button>
+<div class="msg" id="photoMsg"></div>
+<div id="photoOut"></div>
+</div>
 
-    <button onclick="sendTest()">發送數據進行分析</button>
-    <pre id="result">等待發送測試數據...</pre>
-  </div>
+<div class="pane card" id="pane-myscore">
+<h2>我的積分</h2>
+<div class="grid"><div><label>員工編號</label><input id="msId"></div></div>
+<button data-act="myscore">查詢</button>
+<div class="msg" id="msMsg"></div>
+<div id="msOut"></div>
+</div>
 
-  <script>
-    async function sendTest() {
-      const resultBox = document.getElementById('result');
-      resultBox.textContent = '正在傳送數據至 n8n 分析...';
-      const targetUrl = 'https:' + '//learning.n8n.tw/webhook/aom-central';
+<div class="pane card" id="pane-appeal">
+<h2>積分申訴</h2>
+<p class="sub">對某一筆加扣分有疑問時提出，主管會在待辦審核中處理。</p>
+<div class="grid">
+<div><label>員工編號</label><input id="apEmp"></div>
+<div><label>事件編號</label><input id="apEvt" placeholder="可在「我的積分」按申訴自動帶入"></div>
+</div>
+<label style="margin-top:10px">申訴原因（至少 5 個字）</label>
+<textarea id="apReason"></textarea>
+<button data-act="appeal">送出申訴</button>
+<div class="msg" id="apMsg"></div>
+</div>
 
-      let extraData = {};
-      const extraText = document.getElementById('extra_json').value.trim();
-      if (extraText) {
-        try {
-          extraData = JSON.parse(extraText);
-        } catch (e) {
-          resultBox.textContent = '錯誤：「額外自訂 JSON 資料」格式不正確，請檢查大括號與雙引號。';
-          return;
-        }
-      }
+<div class="pane card" id="pane-support">
+<h2>跨店支援申請</h2>
+<div class="grid">
+<div><label>員工編號</label><input id="spEmp"></div>
+<div><label>申請門市</label><input id="spFrom"></div>
+<div><label>支援目標門市</label><input id="spTo"></div>
+<div><label>日期</label><input type="date" id="spDate"></div>
+<div><label>開始時間</label><input type="time" id="spStart" value="10:00"></div>
+<div><label>結束時間</label><input type="time" id="spEnd" value="18:00"></div>
+</div>
+<label class="chk"><input type="checkbox" id="spConsent">員工本人已明確同意前往支援</label>
+<button data-act="support">送出申請</button>
+<div class="msg" id="spMsg"></div>
+</div>
 
-      const data = {
-        tenant_id: document.getElementById('tenant_id').value,
-        store_id: document.getElementById('store_id').value,
-        module_id: document.getElementById('module_id').value,
-        event_type: document.getElementById('event_type').value,
-        requested_by: document.getElementById('requested_by').value,
-        payload: {
-          question: document.getElementById('question').value,
-          metrics: {
-            revenue: Number(document.getElementById('revenue').value),
-            target_revenue: Number(document.getElementById('target_revenue').value),
-            inventory: Number(document.getElementById('inventory').value),
-            safety_stock: Number(document.getElementById('safety_stock').value)
-          },
-          ...extraData
-        }
-      };
+<div class="pane card" id="pane-inbox">
+<h2>待辦審核</h2>
+<button class="gray small" data-act="inbox">重新整理</button>
+<div class="msg" id="ibMsg"></div>
+<div id="ibOut"></div>
+</div>
 
-      try {
-        const response = await fetch(targetUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-          body: JSON.stringify(data)
-        });
-        const text = await response.text();
-        try {
-          resultBox.textContent = JSON.stringify(JSON.parse(text), null, 2);
-        } catch {
-          resultBox.textContent = text;
-        }
-      } catch (err) {
-        resultBox.textContent = '發送失敗：' + err.message;
-      }
+<div class="pane card" id="pane-dash">
+<h2>員工積分總覽</h2>
+<button class="gray small" data-act="dash">重新整理</button>
+<div class="msg" id="dbMsg"></div>
+<div id="dbOut"></div>
+</div>
+
+<div class="pane card" id="pane-scoreevt">
+<h2>登錄積分事件</h2>
+<div class="grid">
+<div><label>員工編號</label><input id="seEmp"></div>
+<div><label>事件類型</label><select id="seType"><option value="hire">新進人員建檔（70 分）</option><option value="support_accepted">完成跨店支援</option><option value="last_minute_leave_unjustified">臨時請假／缺勤</option><option value="customer_satisfaction">顧客滿意度</option><option value="resignation">離職（封存積分）</option></select></div>
+</div>
+<div id="seFields" style="margin-top:10px"></div>
+<button data-act="scoreevt">送出</button>
+<div class="msg" id="seMsg"></div>
+<p class="note">積分僅供管理參考，不得單獨作為減薪、解僱等重大人事處分的依據。</p>
+</div>
+
+<div class="pane card" id="pane-schedule">
+<h2>班表確認</h2>
+<div class="grid">
+<div><label>門市代號</label><input id="scStore"></div>
+<div><label>日期</label><input type="date" id="scDate"></div>
+<div><label>確認主管編號</label><input id="scBy"></div>
+</div>
+<h3>班別（員工編號、開始、結束）</h3>
+<div id="scRows"></div>
+<button class="gray small" data-act="addShift">＋ 新增一列</button><br>
+<button data-act="schedule">確認並儲存班表</button>
+<div class="msg" id="scMsg"></div>
+</div>
+
+
+<div class="pane card" id="pane-profile">
+<h2>員工資料建立／更新</h2><p class="sub">建立員工基本檔案；員工編號會自動帶入登入編號。</p>
+<div class="grid">
+<div><label>員工編號</label><input id="pfId"></div><div><label>姓名</label><input id="pfName" placeholder="請輸入姓名"></div>
+<div><label>門市代號</label><input id="pfStore"></div><div><label>職稱</label><input id="pfTitle" placeholder="例如：門市人員"></div>
+<div><label>電話</label><input id="pfPhone"></div><div><label>Email</label><input id="pfEmail" type="email"></div>
+<div><label>到職日期</label><input id="pfHire" type="date"></div><div><label>在職狀態</label><select id="pfStatus"><option value="active">在職</option><option value="inactive">停職／暫停</option><option value="resigned">離職</option></select></div>
+</div><label>備註</label><textarea id="pfNotes"></textarea><button data-act="profile">儲存員工資料</button><div class="msg" id="pfMsg"></div>
+</div>
+
+<div class="pane card" id="pane-work">
+<h2>工作任務／交接／巡查／異常回報</h2>
+<p class="sub">選擇回報類型並填寫內容；需要主管處理的項目會進入工作審核中心。</p>
+<div class="grid">
+<div><label>回報類型</label><select id="wkModule"><option value="daily_task">每日工作任務</option><option value="handover">工作交接</option><option value="incident">異常事件</option><option value="store_inspection">門市巡查</option><option value="leave_request">請假申請</option><option value="shift_request">排班／調班申請</option><option value="training">教育訓練</option><option value="inventory">庫存紀錄</option><option value="equipment">設備紀錄</option><option value="payroll_bonus">薪資／獎金資料登錄</option><option value="audit_log">稽核紀錄</option></select></div>
+<div><label>門市代號</label><input id="wkStore"></div><div><label>標題</label><input id="wkTitle" placeholder="例如：晚班交接、冷藏櫃異常"></div><div><label>期限（選填）</label><input id="wkDue" type="datetime-local"></div>
+</div><label>詳細內容</label><textarea id="wkDesc" placeholder="請描述工作內容、處理情況、需要協助事項或申請原因"></textarea>
+<button data-act="work">送出工作回報</button><div class="msg" id="wkMsg"></div>
+<p class="note">此入口供紀錄與送審使用；薪資、獎金及重大人事決定仍須人工確認。</p>
+</div>
+
+<div class="pane card" id="pane-document">
+<h2>員工文件呈交</h2><div class="grid"><div><label>員工編號</label><input id="dcEmp"></div><div><label>文件類型</label><select id="dcType"><option value="請假證明">請假證明</option><option value="工作報告">工作報告</option><option value="異常事件報告">異常事件報告</option><option value="教育訓練紀錄">教育訓練紀錄</option><option value="其他文件">其他文件</option></select></div><div><label>文件標題</label><input id="dcTitle" placeholder="請輸入文件名稱"></div></div>
+<label>文件內容／雲端檔案連結</label><textarea id="dcContent" placeholder="可貼上文件內容或已設定權限的雲端檔案連結"></textarea>
+<button data-act="document">呈交主管審核</button><div class="msg" id="dcMsg"></div><p class="note">目前此版本以文字內容或雲端連結呈交，尚未加入附件檔案實際上傳儲存。</p>
+</div>
+
+<div class="pane card" id="pane-sales">
+<h2>每日業績與天氣／節慶紀錄</h2><div class="grid">
+<div><label>日期</label><input id="slDate" type="date"></div><div><label>門市代號</label><input id="slStore"></div><div><label>當日營業額（元）</label><input id="slAmount" type="number" min="0" step="1"></div>
+<div><label>天氣</label><select id="slWeather"><option>晴天</option><option>陰天</option><option>雨天</option><option>高溫</option><option>低溫</option><option>颱風／豪雨</option><option>unknown</option></select></div>
+<div><label>氣溫（°C）</label><input id="slTemp" type="number" step="0.1"></div><div><label>降雨量（mm）</label><input id="slRain" type="number" min="0" step="0.1"></div>
+<div><label>節慶／特殊日</label><input id="slFestival" placeholder="例如：中秋節、連假、無"></div><div><label>促銷活動</label><input id="slCampaign" placeholder="例如：會員日、滿額折扣、無"></div>
+</div><button data-act="sales">送出每日業績紀錄</button><div class="msg" id="slMsg"></div>
+</div>
+
+<div class="pane card" id="pane-workInbox">
+<h2>員工工作審核中心</h2><p class="sub">集中查看請假、排班、異常、庫存、設備及其他待審資料。</p><button class="gray small" data-act="workInbox">重新整理</button><div class="msg" id="wiMsg"></div><div id="wiOut"></div>
+</div>
+
+<div class="pane card" id="pane-docInbox">
+<h2>員工文件審核中心</h2><p class="sub">主管可檢視文件內容、核准或退件，並留下審核意見。</p><button class="gray small" data-act="docInbox">重新整理</button><div class="msg" id="diMsg"></div><div id="diOut"></div>
+</div>
+
+<div class="pane card" id="pane-salesAnalysis">
+<h2>節慶／天氣／促銷業績分析</h2><div class="grid"><div><label>門市代號（留空代表全部門市）</label><input id="anStore" placeholder="例如 S001"></div></div><button data-act="salesAnalysis">開始分析</button><div class="msg" id="anMsg"></div><div id="anOut"></div>
+<p class="note">分析歷史資料的關聯與差異，不代表天氣或節慶單獨造成業績變化；請累積足夠資料再用於排班、備貨或促銷決策。</p>
+</div>
+
+</section>
+</main>
+<script>
+var ORIGIN = 'https://p0965455012.app.n8n.cloud/webhook/';
+var MEM = {};
+function sGet(k){ try { return window.sessionStorage.getItem(k); } catch (e) { return MEM[k] === undefined ? null : MEM[k]; } }
+function sSet(k, v){ try { window.sessionStorage.setItem(k, v); } catch (e) { MEM[k] = v; } }
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s === null || s === undefined ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(s){ if (!s) return '-'; var d = new Date(s); return isNaN(d.getTime()) ? esc(s) : d.toLocaleString('zh-TW', {timeZone:'Asia/Taipei', hour12:false}); }
+function today(){ var d = new Date(); var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dd < 10 ? '0' : '') + dd; }
+
+var ROLES = {
+  employee: {name:'員工', tabs:[['profile','員工資料'],['work','工作回報'],['document','文件呈交'],['sales','每日業績'],['ops','回報營運狀況'],['photo','上傳班表照片'],['myscore','我的積分'],['appeal','積分申訴'],['support','跨店支援申請']]},
+  manager: {name:'主管', tabs:[['workInbox','工作審核中心'],['docInbox','文件審核中心'],['salesAnalysis','節慶天氣業績分析'],['inbox','既有待辦審核'],['dash','積分總覽'],['scoreevt','登錄積分事件'],['schedule','班表確認'],['support','跨店支援申請'],['ops','回報營運狀況']]}
+};
+var FIELDS = ['myId','myStore','hName','hValue','bUser','bPass'];
+var state = {role:null};
+
+var OPS_FIELDS = {
+  complaint: [['category','text','客訴類別','例如 服務、餐點'],['description','textarea','內容描述',''],['urgent','check','緊急（涉及人身安全、食品安全或個資）','']],
+  wait_time: [['minutes','number','目前等候分鐘數',''],['threshold_minutes','number','可接受門檻（分鐘）','15']],
+  equipment: [['status','select','設備狀態','normal:正常|warning:異常但可使用|failed:故障|unsafe:有安全疑慮'],['description','textarea','說明','']],
+  staffing: [['available_staff','number','目前在班人數',''],['required_staff','number','需要人數','']],
+  sales: [['actual','number','實際營收',''],['expected','number','預期營收','']]
+};
+var SE_FIELDS = {
+  hire: [],
+  support_accepted: [['employee_consent','check','員工明確同意支援',''],['support_completed','check','已確認完成支援','']],
+  last_minute_leave_unjustified: [['verified_by_manager','check','主管已核實缺勤事實',''],['reason_reviewed','check','已覆核請假原因',''],['protected_or_lawful_leave','check','屬法定或受保障假別（勾選則不扣分）',''],['policy_violation_confirmed','check','確認違反已公告的出勤規範','']],
+  customer_satisfaction: [['satisfaction_percent','number','滿意度（0 到 100）',''],['attributed_to_employee','check','評價可合理歸因於此員工','']],
+  resignation: []
+};
+
+function msg(id, type, text){ var el = $(id); el.className = 'msg ' + type; el.textContent = text; }
+function clearMsg(id){ var el = $(id); el.className = 'msg'; el.textContent = ''; }
+
+function renderFields(boxId, defs, prefix){
+  var h = '';
+  defs.forEach(function(d){
+    var id = prefix + d[0];
+    if (d[1] === 'check') { h += '<label class="chk" style="grid-column:1/-1"><input type="checkbox" id="' + id + '">' + esc(d[2]) + '</label>'; }
+    else if (d[1] === 'textarea') { h += '<div style="grid-column:1/-1"><label>' + esc(d[2]) + '</label><textarea id="' + id + '"></textarea></div>'; }
+    else if (d[1] === 'select') {
+      var o = '';
+      d[3].split('|').forEach(function(p){ var kv = p.split(':'); o += '<option value="' + kv[0] + '">' + esc(kv[1]) + '</option>'; });
+      h += '<div><label>' + esc(d[2]) + '</label><select id="' + id + '">' + o + '</select></div>';
     }
-  </script>
+    else { h += '<div><label>' + esc(d[2]) + '</label><input type="' + d[1] + '" id="' + id + '" value="' + esc(d[1] === 'number' ? d[3] : '') + '" placeholder="' + esc(d[1] === 'text' ? d[3] : '') + '"></div>'; }
+  });
+  $(boxId).innerHTML = h;
+}
+function readFields(defs, prefix){
+  var o = {};
+  defs.forEach(function(d){
+    var el = $(prefix + d[0]);
+    if (!el) return;
+    if (d[1] === 'check') o[d[0]] = el.checked;
+    else if (d[1] === 'number') { if (el.value !== '') o[d[0]] = Number(el.value); }
+    else if (el.value !== '') o[d[0]] = el.value;
+  });
+  return o;
+}
+
+function selectRole(r){
+  state.role = r;
+  var bs = document.querySelectorAll('.role');
+  for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-role') === r);
+}
+function login(){
+  clearMsg('loginMsg');
+  if (!state.role) { msg('loginMsg','err','請先選擇身分'); return; }
+  if (!$('hName').value.trim() || !$('hValue').value) { msg('loginMsg','err','請輸入金鑰名稱與金鑰值'); return; }
+  if (state.role !== 'staff' && (!$('bUser').value || !$('bPass').value)) { msg('loginMsg','err','員工與主管需要輸入查詢帳號與密碼'); return; }
+  FIELDS.forEach(function(k){ sSet('aomp_' + k, $(k).value); });
+  sSet('aomp_role', state.role);
+  enterApp();
+}
+function enterApp(){
+  var R = ROLES[state.role];
+  $('login').classList.add('hide');
+  $('app').classList.remove('hide');
+  $('hdrBtns').classList.remove('hide');
+  var id = $('myId').value.trim(), st = $('myStore').value.trim();
+  $('who').textContent = R.name + (id ? '｜' + id : '') + (st ? '｜' + st : '');
+  var h = '';
+  R.tabs.forEach(function(t){ h += '<button class="tab" data-tab="' + t[0] + '">' + esc(t[1]) + '</button>'; });
+  $('tabs').innerHTML = h;
+  prefill();
+  setDefaultsV10();
+  showTab(R.tabs[0][0]);
+}
+function logout(){
+  ['hValue','bPass'].forEach(function(k){ $(k).value = ''; sSet('aomp_' + k, ''); });
+  $('app').classList.add('hide');
+  $('login').classList.remove('hide');
+  $('hdrBtns').classList.add('hide');
+  $('who').textContent = '';
+}
+function showTab(t){
+  var ts = document.querySelectorAll('.tab');
+  for (var i = 0; i < ts.length; i++) ts[i].classList.toggle('on', ts[i].getAttribute('data-tab') === t);
+  var ps = document.querySelectorAll('.pane');
+  for (var j = 0; j < ps.length; j++) ps[j].classList.toggle('on', ps[j].id === 'pane-' + t);
+  if (t === 'inbox') busyRun(loadInbox);
+  if (t === 'dash') busyRun(loadDash);
+  if (t === 'workInbox') busyRun(loadV10WorkInbox);
+  if (t === 'docInbox') busyRun(loadV10DocInbox);
+  if (t === 'salesAnalysis') setDefaultsV10();
+}
+function prefill(){
+  var id = $('myId').value.trim(), st = $('myStore').value.trim();
+  function setIf(k, v){ if (v && !$(k).value) $(k).value = v; }
+  if (state.role === 'employee') { setIf('msId', id); setIf('apEmp', id); setIf('spEmp', id); }
+  if (state.role === 'manager') { setIf('scBy', id); }
+  ['opsStore','photoStore','spFrom','scStore'].forEach(function(k){ setIf(k, st); });
+  setIf('spDate', today());
+  setIf('scDate', today());
+  setDefaultsV10();
+}
+
+async function api(path, opt){
+  opt = opt || {};
+  var headers = {};
+  if (opt.auth === 'basic') headers['Authorization'] = 'Basic ' + btoa(unescape(encodeURIComponent($('bUser').value + ':' + $('bPass').value)));
+  else headers[$('hName').value.trim()] = $('hValue').value;
+  var init = {method: opt.method || 'GET', headers: headers};
+  if (opt.json !== undefined) { headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(opt.json); }
+  if (opt.form) init.body = opt.form;
+  var url = ORIGIN + path + (opt.query ? '?' + opt.query : '');
+  var res;
+  try { res = await fetch(url, init); } catch (e) { return {ok:false, status:0, error:'無法連線到伺服器，請檢查網路後再試。'}; }
+  var text = await res.text(); var data = null;
+  try { data = JSON.parse(text); } catch (e) {}
+  if (res.status === 401 || res.status === 403) return {ok:false, status:res.status, error:'驗證失敗：請按右上角「切換身分 / 登出」重新輸入金鑰或帳號密碼。'};
+  if (res.status === 404) return {ok:false, status:404, error:'找不到服務（404），請聯絡系統管理員確認系統已啟用。'};
+  if (!res.ok) { var m = (data && (data.error || data.message)) || ('伺服器錯誤（HTTP ' + res.status + '）'); return {ok:false, status:res.status, error:String(m), data:data}; }
+  if (data && data.ok === false) return {ok:false, status:res.status, error:data.error || data.message || '資料有誤', data:data};
+  return {ok:true, status:res.status, data:data};
+}
+
+async function doOps(){
+  clearMsg('opsMsg'); $('opsOut').innerHTML = '';
+  var type = $('opsType').value, store = $('opsStore').value.trim();
+  if (!store) { msg('opsMsg','err','請輸入門市代號'); return; }
+  var r = await api('aom-v07-operations-event', {method:'POST', json:{store_id:store, event_type:type, payload:readFields(OPS_FIELDS[type], 'of_')}});
+  if (!r.ok) { msg('opsMsg','err',r.error); return; }
+  var d = r.data || {};
+  msg('opsMsg', d.requires_approval ? 'info' : 'ok', d.requires_approval ? '已送出：此事件風險較高，請立即通知主管處理。' : '已送出，以下是處理建議。');
+  var sev = {critical:'重大', high:'高', medium:'中', normal:'一般'};
+  var acts = (d.recommended_actions || []).map(function(a){ return '<li>' + esc(a) + '</li>'; }).join('');
+  $('opsOut').innerHTML = '<div class="item" style="margin-top:12px"><div><span class="badge b-' + esc(d.severity) + '">嚴重度：' + esc(sev[d.severity] || d.severity) + '</span></div><p>' + esc(d.summary) + '</p>' + (acts ? '<div class="t">建議處理</div><ul>' + acts + '</ul>' : '') + '<div class="sub">' + esc(d.notice) + '</div></div>';
+}
+
+async function doPhoto(){
+  clearMsg('photoMsg'); $('photoOut').innerHTML = '';
+  var f = $('photoFile').files[0];
+  if (!f) { msg('photoMsg','err','請先選擇照片'); return; }
+  var fd = new FormData(); fd.append('schedule_image', f);
+  var st = $('photoStore').value.trim(); if (st) fd.append('target_store_id', st);
+  msg('photoMsg','info','辨識中，約需 10 到 30 秒，請稍候…');
+  var r = await api('aom-v07-schedule-photo', {method:'POST', form:fd});
+  if (!r.ok) { msg('photoMsg','err',r.error); return; }
+  var d = r.data || {};
+  msg('photoMsg', d.needs_review ? 'info' : 'ok', '辨識完成，共 ' + (d.row_count || 0) + ' 列' + (d.needs_review ? '，部分內容需要人工確認。' : '。'));
+  var stx = {scheduled:'上班', leave:'請假', absent:'缺勤', unknown:'不明'};
+  var rows = (d.rows || []).map(function(x){ return '<tr><td>' + esc(x.employee_name) + '</td><td>' + esc(x.employee_id || '-') + '</td><td>' + esc(x.shift_start || '-') + ' – ' + esc(x.shift_end || '-') + '</td><td>' + esc(stx[x.status] || x.status) + '</td><td>' + Math.round((x.confidence || 0) * 100) + '%</td><td>' + esc(x.notes || '') + '</td></tr>'; }).join('');
+  var unread = (d.unreadable_items || []);
+  $('photoOut').innerHTML = '<p class="sub" style="margin-top:12px">日期：' + esc(d.schedule_date || '未辨識') + '｜門市：' + esc(d.recognized_store || '未辨識') + '</p><table><thead><tr><th>姓名</th><th>編號</th><th>時段</th><th>狀態</th><th>信心</th><th>備註</th></tr></thead><tbody>' + (rows || '<tr><td colspan="6">沒有辨識到資料</td></tr>') + '</tbody></table>' + (unread.length ? '<p class="sub">無法辨識：' + esc(unread.join('、')) + '</p>' : '');
+}
+
+async function doMyScore(){
+  clearMsg('msMsg'); $('msOut').innerHTML = '';
+  var id = $('msId').value.trim();
+  if (!id) { msg('msMsg','err','請輸入員工編號'); return; }
+  var r = await api('aom-v07-employee-score-lookup', {auth:'basic', query:'format=json&employee_id=' + encodeURIComponent(id)});
+  if (!r.ok) { msg('msMsg','err',r.error); return; }
+  var d = r.data || {};
+  var hist = (d.history || []).slice().reverse().map(function(h){
+    return '<div class="item"><div class="t">' + (h.delta > 0 ? '+' : '') + esc(h.delta) + ' 分 → ' + esc(h.score_after) + ' 分' + (h.needs_review ? ' <span class="badge b-medium">待覆核</span>' : '') + '</div><div>' + esc(h.reason) + '</div><div class="sub">' + fmt(h.at) + '｜事件編號 ' + esc(h.event_id) + '</div><button class="small gray" data-act="appealFor" data-evt="' + esc(h.event_id) + '">對這筆提出申訴</button></div>';
+  }).join('');
+  $('msOut').innerHTML = '<div class="big">' + esc(d.score) + ' 分</div><div class="sub">' + (d.status === 'active' ? '在職' : '已離職') + '｜最後更新 ' + fmt(d.updated_at) + '</div><h3>積分紀錄</h3>' + (hist || '<p class="sub">尚無紀錄</p>');
+}
+
+async function doAppeal(){
+  clearMsg('apMsg');
+  var b = {employee_id:$('apEmp').value.trim(), event_id:$('apEvt').value.trim(), reason:$('apReason').value.trim()};
+  if (!b.employee_id || !b.event_id) { msg('apMsg','err','請填寫員工編號與事件編號'); return; }
+  if (b.reason.length < 5) { msg('apMsg','err','申訴原因至少 5 個字'); return; }
+  var r = await api('aom-v07-score-appeal', {method:'POST', json:b});
+  if (!r.ok) { msg('apMsg','err',r.error); return; }
+  msg('apMsg','ok','申訴已送出（編號 ' + r.data.appeal_id + '），主管審核後會更新狀態。');
+  $('apReason').value = '';
+}
+
+async function doSupport(){
+  clearMsg('spMsg');
+  var b = {employee_id:$('spEmp').value.trim(), request_store_id:$('spFrom').value.trim(), target_store_id:$('spTo').value.trim(), shift_date:$('spDate').value, start_time:$('spStart').value, end_time:$('spEnd').value, employee_consent:$('spConsent').checked};
+  if (!b.employee_id || !b.request_store_id || !b.target_store_id || !b.shift_date || !b.start_time || !b.end_time) { msg('spMsg','err','請填寫所有欄位'); return; }
+  if (b.request_store_id === b.target_store_id) { msg('spMsg','err','申請門市與支援目標門市不可相同'); return; }
+  if (!b.employee_consent) { msg('spMsg','err','必須取得員工本人同意才能送出'); return; }
+  var r = await api('aom-v07-cross-store-support', {method:'POST', json:b});
+  if (!r.ok) { msg('spMsg','err',r.error); return; }
+  msg('spMsg','ok','申請已送出（編號 ' + r.data.request_id + '），等待主管審核。');
+  $('spConsent').checked = false;
+}
+
+function reviewCard(x, title, lines){
+  var pending = !x.decision;
+  var cls = pending ? 'b-medium' : (x.decision === 'approve' ? 'b-normal' : 'b-critical');
+  var label = pending ? '待審核' : (x.decision === 'approve' ? '已核准' : '已駁回');
+  var h = '<div class="item"><div class="t">' + esc(title) + ' <span class="badge ' + cls + '">' + label + '</span></div>' + lines + '<div class="sub">編號 ' + esc(x.id) + '</div>';
+  if (pending) h += '<input id="nt_' + esc(x.id) + '" placeholder="審核備註（選填）" style="margin-top:8px"><button class="small green" data-act="decide" data-id="' + esc(x.id) + '" data-d="approve">核准</button><button class="small red" data-act="decide" data-id="' + esc(x.id) + '" data-d="reject">駁回</button>';
+  else h += '<div class="sub">由 ' + esc(x.reviewer_id) + ' 於 ' + fmt(x.acted_at) + ' 處理' + (x.review_note ? '｜' + esc(x.review_note) : '') + '</div>';
+  return h + '</div>';
+}
+async function loadInbox(){
+  clearMsg('ibMsg'); $('ibOut').innerHTML = '<p class="sub">載入中…</p>';
+  var r = await api('aom-v07-manager-inbox', {auth:'basic'});
+  if (!r.ok) { $('ibOut').innerHTML = ''; msg('ibMsg','err',r.error); return; }
+  var d = r.data || {};
+  var ap = (d.appeals || []).map(function(x){ return reviewCard(x, '積分申訴｜' + x.employee_id, '<div>事件 ' + esc(x.event_id) + '：' + esc(x.reason) + '</div><div class="sub">提出時間 ' + fmt(x.submitted_at) + '</div>'); }).join('');
+  var sp = (d.support_requests || []).map(function(x){ return reviewCard(x, '跨店支援｜' + x.employee_id, '<div>' + esc(x.request_store_id) + ' → ' + esc(x.target_store_id) + '｜' + esc(x.shift_date) + ' ' + esc(x.start_time) + ' – ' + esc(x.end_time) + '</div><div class="sub">申請時間 ' + fmt(x.created_at) + '</div>'); }).join('');
+  var sc = (d.schedules || []).map(function(s){ return '<tr><td>' + esc(s.schedule_date) + '</td><td>' + esc(s.store_id) + '</td><td>' + esc(s.shift_count) + '</td><td>' + esc(s.confirmed_by) + '</td><td>' + fmt(s.confirmed_at) + '</td></tr>'; }).join('');
+  $('ibOut').innerHTML = '<div class="stats" style="margin-top:12px"><div class="stat">待審申訴<b>' + esc(d.pending_appeals || 0) + '</b></div><div class="stat">待審支援申請<b>' + esc(d.pending_support || 0) + '</b></div></div>'
+    + '<h3>積分申訴</h3>' + (ap || '<p class="sub">目前沒有申訴</p>')
+    + '<h3>跨店支援申請</h3>' + (sp || '<p class="sub">目前沒有申請</p>')
+    + '<h3>最近確認的班表</h3>' + (sc ? '<table><thead><tr><th>日期</th><th>門市</th><th>班別數</th><th>確認者</th><th>確認時間</th></tr></thead><tbody>' + sc + '</tbody></table>' : '<p class="sub">尚無資料</p>');
+}
+async function decide(btn){
+  var id = btn.getAttribute('data-id'), dec = btn.getAttribute('data-d');
+  var rid = $('myId').value.trim();
+  if (!rid) { msg('ibMsg','err','請先登出，並在登入頁填寫主管編號'); return; }
+  var nt = $('nt_' + id);
+  var r = await api('aom-v07-approval-action', {method:'POST', json:{approval_id:id, reviewer_id:rid, decision:dec, note: nt ? nt.value : ''}});
+  if (!r.ok) { msg('ibMsg','err',r.error); return; }
+  await loadInbox();
+  msg('ibMsg','ok',(dec === 'approve' ? '已核准 ' : '已駁回 ') + id);
+}
+
+async function loadDash(){
+  clearMsg('dbMsg'); $('dbOut').innerHTML = '<p class="sub">載入中…</p>';
+  var r = await api('aom-v07-employee-score-dashboard', {auth:'basic', query:'format=json'});
+  if (!r.ok) { $('dbOut').innerHTML = ''; msg('dbMsg','err',r.error); return; }
+  var d = r.data || {}, s = d.summary || {};
+  var rows = (d.employees || []).map(function(e){ return '<tr><td>' + esc(e.employee_id) + '</td><td><b>' + esc(e.score) + '</b></td><td>' + (e.status === 'active' ? '在職' : '已離職') + '</td><td>' + esc(e.event_count) + '</td><td>' + fmt(e.updated_at) + '</td></tr>'; }).join('');
+  $('dbOut').innerHTML = '<div class="stats" style="margin-top:12px"><div class="stat">員工總數<b>' + esc(s.total || 0) + '</b></div><div class="stat">在職<b>' + esc(s.active || 0) + '</b></div><div class="stat">已離職<b>' + esc(s.resigned || 0) + '</b></div><div class="stat">在職平均分<b>' + esc(s.average_active_score || 0) + '</b></div></div><table><thead><tr><th>員工</th><th>積分</th><th>狀態</th><th>加扣分次數</th><th>最後更新</th></tr></thead><tbody>' + (rows || '<tr><td colspan="5">目前沒有員工資料</td></tr>') + '</tbody></table>';
+}
+
+async function doScoreEvt(){
+  clearMsg('seMsg');
+  var t = $('seType').value, emp = $('seEmp').value.trim();
+  if (!emp) { msg('seMsg','err','請輸入員工編號'); return; }
+  var f = readFields(SE_FIELDS[t], 'sf_');
+  if (t === 'support_accepted' && (!f.employee_consent || !f.support_completed)) { msg('seMsg','err','完成跨店支援需勾選「員工明確同意」與「已確認完成支援」'); return; }
+  if (t === 'customer_satisfaction' && (f.satisfaction_percent === undefined || f.satisfaction_percent < 0 || f.satisfaction_percent > 100)) { msg('seMsg','err','滿意度請填 0 到 100'); return; }
+  var b = Object.assign({employee_id:emp, event_type:t, event_id:'EVT-' + Date.now()}, f);
+  var r = await api('aom-v07-employee-score-event', {method:'POST', json:b});
+  if (!r.ok) { msg('seMsg','err',r.error); return; }
+  var d = r.data || {};
+  if (d.duplicate) { msg('seMsg','info',d.message || '此事件已處理過'); return; }
+  msg('seMsg', d.needs_review ? 'info' : 'ok', d.employee_id + '：' + (d.delta > 0 ? '+' : '') + d.delta + ' 分，目前 ' + d.score + ' 分。' + (d.reason || ''));
+}
+
+function addShift(){
+  var div = document.createElement('div');
+  div.className = 'shift';
+  div.innerHTML = '<input class="sh-emp" placeholder="員工編號"><input type="time" class="sh-s" value="09:00"><input type="time" class="sh-e" value="17:00"><button class="small gray" data-act="delShift">刪除</button>';
+  $('scRows').appendChild(div);
+}
+async function doSchedule(){
+  clearMsg('scMsg');
+  var shifts = [];
+  var rows = document.querySelectorAll('#scRows .shift');
+  for (var i = 0; i < rows.length; i++) {
+    var emp = rows[i].querySelector('.sh-emp').value.trim(), s = rows[i].querySelector('.sh-s').value, e = rows[i].querySelector('.sh-e').value;
+    if (emp) shifts.push({employee_id:emp, start_time:s, end_time:e});
+  }
+  var b = {store_id:$('scStore').value.trim(), schedule_date:$('scDate').value, confirmed_by:$('scBy').value.trim(), shifts:shifts};
+  if (!b.store_id || !b.schedule_date || !b.confirmed_by) { msg('scMsg','err','請填寫門市、日期與確認主管'); return; }
+  if (!shifts.length) { msg('scMsg','err','至少需要一筆班別'); return; }
+  for (var j = 0; j < shifts.length; j++) { if (!shifts[j].start_time || !shifts[j].end_time) { msg('scMsg','err','每筆班別都要有開始與結束時間'); return; } }
+  var r = await api('aom-v07-schedule-confirm', {method:'POST', json:b});
+  if (!r.ok) { msg('scMsg','err',r.error); return; }
+  msg('scMsg','ok','班表已確認並儲存（編號 ' + r.data.schedule_id + '，共 ' + shifts.length + ' 筆班別）。');
+}
+
+
+function setDefaultsV10(){
+ var id=$('myId').value.trim(), st=$('myStore').value.trim();
+ [['pfId',id],['pfStore',st],['dcEmp',id],['wkStore',st],['slStore',st],['anStore',st]].forEach(function(x){if($(x[0])&&!$(x[0]).value)$(x[0]).value=x[1]||'';});
+ if($('slDate')&&!$('slDate').value)$('slDate').value=today();
+}
+async function doProfile(){
+ clearMsg('pfMsg');var b={employee_id:$('pfId').value.trim(),full_name:$('pfName').value.trim(),store_id:$('pfStore').value.trim(),job_title:$('pfTitle').value.trim(),phone:$('pfPhone').value.trim(),email:$('pfEmail').value.trim(),hire_date:$('pfHire').value,status:$('pfStatus').value,notes:$('pfNotes').value.trim()};
+ if(!b.employee_id||!b.full_name){msg('pfMsg','err','員工編號與姓名為必填。');return;}
+ var r=await api('aom-v07-employee-profile',{method:'POST',json:b});if(!r.ok){msg('pfMsg','err',r.error);return;}msg('pfMsg','ok','員工資料已建立／更新：'+b.employee_id);
+}
+async function doWork(){
+ clearMsg('wkMsg');var module=$('wkModule').value,title=$('wkTitle').value.trim(),employee_id=$('myId').value.trim(),store_id=$('wkStore').value.trim();
+ if(!employee_id||!title){msg('wkMsg','err','請確認登入員工編號並填寫標題。');return;}
+ var payload={description:$('wkDesc').value.trim()};
+ var due=$('wkDue').value?new Date($('wkDue').value).toISOString():'';
+ var r=await api('aom-v09-record-submit',{method:'POST',json:{module:module,title:title,employee_id:employee_id,store_id:store_id,payload:payload,due_at:due}});
+ if(!r.ok){msg('wkMsg','err',r.error);return;}msg('wkMsg','ok','已送出，紀錄編號：'+(r.data.record_id||'已建立')+'；狀態：'+(r.data.status||'已提交'));
+ $('wkTitle').value='';$('wkDesc').value='';$('wkDue').value='';
+}
+async function doDocument(){
+ clearMsg('dcMsg');var b={employee_id:$('dcEmp').value.trim(),document_type:$('dcType').value,title:$('dcTitle').value.trim(),content:$('dcContent').value.trim()};
+ if(!b.employee_id||!b.title||!b.content){msg('dcMsg','err','員工編號、文件標題及文件內容皆須填寫。');return;}
+ var r=await api('aom-v07-employee-document-submit',{method:'POST',json:b});if(!r.ok){msg('dcMsg','err',r.error);return;}msg('dcMsg','ok','文件已呈交，編號：'+(r.data.document_id||'已建立')+'，等待主管審核。');$('dcTitle').value='';$('dcContent').value='';
+}
+async function doSales(){
+ clearMsg('slMsg');var emp=$('myId').value.trim(),store=$('slStore').value.trim(),sales=Number($('slAmount').value),date=$('slDate').value;
+ if(!emp||!store||!date||$('slAmount').value===''||!Number.isFinite(sales)||sales<0){msg('slMsg','err','請填寫員工編號、門市、日期及有效營業額。');return;}
+ var p={date:date,sales:sales,weather:$('slWeather').value,temp_c:$('slTemp').value===''?null:Number($('slTemp').value),rainfall_mm:$('slRain').value===''?null:Number($('slRain').value),festival:$('slFestival').value.trim()||'無',campaign:$('slCampaign').value.trim()||'無'};
+ var r=await api('aom-v09-record-submit',{method:'POST',json:{module:'sales_daily',employee_id:emp,store_id:store,title:'每日營業額 '+date,payload:p}});
+ if(!r.ok){msg('slMsg','err',r.error);return;}msg('slMsg','ok','每日業績已記錄，編號：'+(r.data.record_id||'已建立'));$('slAmount').value='';
+}
+function v10ReviewCard(x){
+ var payload={};try{payload=JSON.parse(x.payload||'{}')}catch(e){payload={raw:x.payload}};
+ var html='<div class="item"><div class="t">'+esc(x.title)+' <span class="badge b-medium">'+esc(x.status)+'</span></div><div class="sub">'+esc(x.module)+'｜員工 '+esc(x.employee_id)+'｜門市 '+esc(x.store_id||'-')+'｜'+fmt(x.created_at)+'</div><pre class="data">'+esc(JSON.stringify(payload,null,2))+'</pre><div class="sub">紀錄編號 '+esc(x.record_id)+'</div>';
+ if(x.due_at)html+='<div class="sub">期限：'+esc(x.due_at)+'</div>';
+ html+='<input id="v9note_'+esc(x.record_id)+'" placeholder="主管審核意見／退件原因" style="margin-top:8px">';
+ html+='<button class="small green" data-act="v9review" data-id="'+esc(x.record_id)+'" data-d="approve">核准</button><button class="small red" data-act="v9review" data-id="'+esc(x.record_id)+'" data-d="reject">退件</button><button class="small gray" data-act="v9review" data-id="'+esc(x.record_id)+'" data-d="request_info">要求補件</button></div>';return html;
+}
+async function loadV10WorkInbox(){
+ clearMsg('wiMsg');$('wiOut').innerHTML='<p class="sub">載入中…</p>';var r=await api('aom-v09-manager-inbox');if(!r.ok){$('wiOut').innerHTML='';msg('wiMsg','err',r.error);return;}
+ var d=r.data||{},rows=d.pending_records||[],over=d.overdue_records||[];
+ $('wiOut').innerHTML='<div class="stats"><div class="stat">全部紀錄<b>'+esc(d.total||0)+'</b></div><div class="stat">待審核<b>'+esc(d.pending_count||0)+'</b></div><div class="stat">逾期<b>'+esc(d.overdue_count||0)+'</b></div></div><h3>待審核紀錄</h3>'+(rows.map(v10ReviewCard).join('')||'<p class="sub">目前沒有待審資料。</p>')+'<h3>逾期紀錄</h3>'+(over.map(function(x){return '<div class="item"><b>'+esc(x.title)+'</b><div class="sub">'+esc(x.module)+'｜'+esc(x.employee_id)+'｜期限 '+esc(x.due_at)+'</div></div>';}).join('')||'<p class="sub">目前沒有逾期紀錄。</p>');
+}
+async function reviewV10Record(btn){
+ var id=btn.getAttribute('data-id'),decision=btn.getAttribute('data-d'),reviewer=$('myId').value.trim(),note=$('v9note_'+id).value.trim();if(!reviewer){msg('wiMsg','err','請填寫主管編號後重新登入。');return;}
+ if(decision!=='approve'&&!note){msg('wiMsg','err','退件或要求補件時，請填寫原因。');return;}
+ var r=await api('aom-v09-manager-action',{method:'POST',json:{record_id:id,reviewer_id:reviewer,decision:decision,review_note:note}});if(!r.ok){msg('wiMsg','err',r.error);return;}await loadV10WorkInbox();msg('wiMsg','ok','審核結果已更新。');
+}
+async function loadV10DocInbox(){
+ clearMsg('diMsg');$('diOut').innerHTML='<p class="sub">載入中…</p>';var r=await api('aom-v07-document-inbox',{auth:'basic'});if(!r.ok){$('diOut').innerHTML='';msg('diMsg','err',r.error);return;}
+ var d=r.data||{},rows=d.pending_documents||[];
+ $('diOut').innerHTML='<div class="stats"><div class="stat">文件總數<b>'+esc(d.total||0)+'</b></div><div class="stat">待審文件<b>'+esc(d.pending_count||0)+'</b></div></div>'+(rows.map(function(x){return '<div class="item"><div class="t">'+esc(x.title)+' <span class="badge b-medium">待審核</span></div><div class="sub">'+esc(x.document_type)+'｜員工 '+esc(x.employee_id)+'｜'+fmt(x.submitted_at)+'</div><details><summary>檢視文件內容</summary><pre class="data">'+esc(x.content)+'</pre></details><input id="docnote_'+esc(x.document_id)+'" placeholder="審核意見／退件原因" style="margin-top:8px"><button class="small green" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="approve">核准</button><button class="small red" data-act="docreview" data-id="'+esc(x.document_id)+'" data-d="reject">退件</button></div>';}).join('')||'<p class="sub">目前沒有待審文件。</p>');
+}
+async function reviewV10Doc(btn){
+ var id=btn.getAttribute('data-id'),decision=btn.getAttribute('data-d'),reviewer=$('myId').value.trim(),note=$('docnote_'+id).value.trim();if(!reviewer){msg('diMsg','err','請填寫主管編號後重新登入。');return;}if(decision==='reject'&&!note){msg('diMsg','err','退件時請填寫退件原因。');return;}
+ var r=await api('aom-v07-document-review',{method:'POST',json:{document_id:id,reviewer_id:reviewer,decision:decision,review_note:note}});if(!r.ok){msg('diMsg','err',r.error);return;}await loadV10DocInbox();msg('diMsg','ok','文件審核完成。');
+}
+async function loadV10SalesAnalysis(){
+ clearMsg('anMsg');$('anOut').innerHTML='<p class="sub">分析中…</p>';var st=$('anStore').value.trim(),q=st?'store_id='+encodeURIComponent(st):'';var r=await api('aom-v09-sales-analysis',{query:q});if(!r.ok){$('anOut').innerHTML='';msg('anMsg','err',r.error);return;}
+ var d=r.data||{},f=d.factor_comparisons||[];var latest=d.latest_record||{};
+ var factors=f.map(function(x){return '<tr><td>'+esc(x.factor)+'</td><td>'+esc(x.with_factor_count)+'</td><td>'+esc(x.with_factor_avg)+'</td><td>'+esc(x.without_factor_count)+'</td><td>'+esc(x.without_factor_avg)+'</td><td>'+(x.difference_percent===null?'資料不足':esc(x.difference_percent)+'%')+'</td></tr>';}).join('');
+ var rec=(d.recommendations||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
+ $('anOut').innerHTML='<div class="stats"><div class="stat">有效紀錄<b>'+esc(d.records_count||0)+'</b></div><div class="stat">最新營業額<b>'+esc(latest.sales===undefined?'-':latest.sales)+'</b></div><div class="stat">相較同星期基準<b>'+(d.latest_vs_weekday_baseline_percent===null?'資料不足':esc(d.latest_vs_weekday_baseline_percent)+'%')+'</b></div></div><p class="sub">門市：'+esc(d.store_id||'全部')+'｜最新日期：'+esc(latest.date||'-')+'</p><h3>因素比較（有此因素 vs 無此因素）</h3><table><thead><tr><th>因素</th><th>有因素筆數</th><th>有因素平均營業額</th><th>無因素筆數</th><th>無因素平均營業額</th><th>差異</th></tr></thead><tbody>'+factors+'</tbody></table><h3>分析提醒</h3><ul>'+rec+'</ul><p class="note">'+esc(d.caution||'此分析僅供營運參考。')+'</p>';
+ msg('anMsg','ok','分析完成。');
+}
+
+async function busyRun(fn, btn){
+  if (btn) { if (btn.disabled) return; btn.disabled = true; }
+  try { await fn(); } catch (e) {} finally { if (btn) btn.disabled = false; }
+}
+
+document.addEventListener('click', function(ev){
+  var el = ev.target.closest('[data-act],[data-role],[data-tab]');
+  if (!el) return;
+  if (el.hasAttribute('data-role')) { selectRole(el.getAttribute('data-role')); return; }
+  if (el.hasAttribute('data-tab')) { showTab(el.getAttribute('data-tab')); return; }
+  var a = el.getAttribute('data-act');
+  if (a === 'login') { login(); return; }
+  if (a === 'logout') { logout(); return; }
+  if (a === 'addShift') { addShift(); return; }
+  if (a === 'delShift') { el.closest('.shift').remove(); return; }
+  if (a === 'appealFor') { $('apEvt').value = el.getAttribute('data-evt'); $('apEmp').value = $('msId').value; showTab('appeal'); $('apReason').focus(); return; }
+  if (a === 'decide') { busyRun(function(){ return decide(el); }, el); return; }
+  if (a === 'v9review') { busyRun(function(){ return reviewV10Record(el); }, el); return; }
+  if (a === 'docreview') { busyRun(function(){ return reviewV10Doc(el); }, el); return; }
+  var map = {ops:doOps, photo:doPhoto, myscore:doMyScore, appeal:doAppeal, support:doSupport, inbox:loadInbox, dash:loadDash, scoreevt:doScoreEvt, schedule:doSchedule, profile:doProfile, work:doWork, document:doDocument, sales:doSales, workInbox:loadV10WorkInbox, docInbox:loadV10DocInbox, salesAnalysis:loadV10SalesAnalysis};
+  if (map[a]) busyRun(map[a], el);
+});
+
+$('opsType').addEventListener('change', function(){ renderFields('opsFields', OPS_FIELDS[$('opsType').value], 'of_'); });
+$('seType').addEventListener('change', function(){ renderFields('seFields', SE_FIELDS[$('seType').value], 'sf_'); });
+renderFields('opsFields', OPS_FIELDS.complaint, 'of_');
+renderFields('seFields', SE_FIELDS.hire, 'sf_');
+addShift();
+try {
+  FIELDS.forEach(function(k){ var v = sGet('aomp_' + k); if (v !== null) $(k).value = v; });
+  var savedRole = sGet('aomp_role');
+  if (savedRole && ROLES[savedRole]) selectRole(savedRole);
+} catch (e) {}
+if (state.role && $('hValue').value) enterApp();
+</script>
 </body>
 </html>
