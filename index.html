@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AOM 無人主管系統</title>
+<title>AOM 無人主管系統｜第13版</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;background:#f3f5f9;color:#1f2937;font-size:15px}
@@ -78,7 +78,8 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 <label>選擇身分</label>
 <div class="roles">
 <button type="button" class="role" data-role="employee"><b>員工</b><span>回報營運、上傳班表、查詢積分、申訴及跨店支援</span></button>
-<button type="button" class="role" data-role="manager"><b>主管</b><span>審核、積分總覽、排班</span></button>
+<button type="button" class="role" data-role="manager"><b>主管</b><span>員工建檔、文件與工作審核、營運回報、排班</span></button>
+<button type="button" class="role" data-role="executive"><b>高階主管</b><span>節慶天氣業績分析、員工申訴與管理監督</span></button>
 </div>
 <div class="grid" style="margin-top:12px">
 <div><label>我的編號（員工或主管編號）</label><input id="myId" placeholder="例如 E001 或 M001" autocomplete="off"></div>
@@ -87,6 +88,8 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 <div><label>金鑰值（Header）</label><input id="hValue" type="password" autocomplete="off"></div>
 <div><label>查詢帳號（員工、主管需要）</label><input id="bUser" autocomplete="off"></div>
 <div><label>查詢密碼（員工、主管需要）</label><input id="bPass" type="password" autocomplete="off"></div>
+<div><label>高階主管專用帳號（僅高階主管）</label><input id="eUser" autocomplete="off"></div>
+<div><label>高階主管專用密碼（僅高階主管）</label><input id="ePass" type="password" autocomplete="off"></div>
 </div>
 <button data-act="login">進入系統</button>
 <div class="msg" id="loginMsg"></div>
@@ -138,6 +141,10 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 <textarea id="apReason"></textarea>
 <button data-act="appeal">送出申訴</button>
 <div class="msg" id="apMsg"></div>
+<h3>員工申訴／工作意見回報</h3>
+<div class="grid"><div><label>申訴類別</label><select id="grCategory"><option value="workplace">工作環境</option><option value="management">管理方式／主管溝通</option><option value="schedule">排班與工時</option><option value="harassment">不當對待／職場霸凌疑慮</option><option value="pay">薪資或獎金疑義</option><option value="other">其他</option></select></div><div><label>是否希望保密身分</label><select id="grConfidential"><option value="yes">是，請限縮知悉範圍</option><option value="no">否</option></select></div></div>
+<label style="margin-top:10px">申訴／回報內容</label><textarea id="grDescription" placeholder="請描述發生時間、地點、相關情況及希望協助事項"></textarea>
+<button data-act="grievance">送出員工申訴／回報</button><div class="msg" id="grMsg"></div>
 <h3>跨店支援登記</h3>
 <div class="grid">
 <div><label>員工編號</label><input id="spEmp"></div>
@@ -194,14 +201,14 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 
 
 <div class="pane card" id="pane-profile">
-<h2>員工資料建立／更新</h2><p class="sub">可直接拍攝或掃描員工資料，檔案會隨員工資料一併呈交主管留存。</p>
+<h2>員工資料建立／更新</h2><p class="sub">主管可掃描員工資料，先由 AI 擷取欄位，再人工核對後建立或更新員工主檔。</p>
 <div class="grid">
 <div><label>員工編號</label><input id="pfId"></div><div><label>姓名</label><input id="pfName" placeholder="請輸入姓名"></div>
-<div><label>員工資料掃描／拍照檔案</label><input id="pfFile" type="file" accept="image/*,.pdf"></div>
+<div style="grid-column:1/-1"><label>員工資料掃描／拍照檔案（支援圖片）</label><input id="pfFile" type="file" accept="image/*"><button type="button" class="gray small" data-act="scanProfile">掃描辨識並帶入欄位</button><span class="sub">PDF 暫不支援 OCR；可先轉成圖片。辨識結果請人工核對。</span></div>
 <div><label>門市代號</label><input id="pfStore"></div><div><label>職稱</label><input id="pfTitle" placeholder="例如：門市人員"></div>
-<div><label>電話</label><input id="pfPhone"></div><div><label>Email</label><input id="pfEmail" type="email"></div>
+<div><label>電話</label><input id="pfPhone" type="tel"></div><div><label>Email</label><input id="pfEmail" type="email"></div><div style="grid-column:1/-1"><label>地址</label><input id="pfAddress" placeholder="請確認掃描辨識結果並填寫完整地址"></div>
 <div><label>到職日期</label><input id="pfHire" type="date"></div><div><label>在職狀態</label><select id="pfStatus"><option value="active">在職</option><option value="inactive">停職／暫停</option><option value="resigned">離職</option></select></div>
-</div><label>備註</label><textarea id="pfNotes"></textarea><button data-act="profile">儲存員工資料與掃描檔</button><div class="msg" id="pfMsg"></div>
+</div><label>備註</label><textarea id="pfNotes"></textarea><button data-act="profile">儲存／更新員工資料</button><div class="msg" id="pfMsg"></div>
 </div>
 
 <div class="pane card" id="pane-work">
@@ -224,7 +231,7 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 <div class="pane card" id="pane-sales">
 <h2>每日業績與節慶紀錄</h2><div class="grid">
 <div><label>日期</label><input id="slDate" type="date"></div><div><label>門市代號</label><input id="slStore"></div><div><label>當日營業額（元）</label><input id="slAmount" type="number" min="0" step="1"></div>
-<div><label>天氣</label><select id="slWeather"><option>晴天</option><option>陰天</option><option>雨天</option><option>颱風／豪雨</option><option>unknown</option></select></div>
+<div><label>天氣（可自行輸入）</label><input id="slWeather" type="text" placeholder="例如：晴天、陰天、雨天、unknown、多雲、寒流"></div>
 
 <div><label>節慶／特殊日</label><input id="slFestival" placeholder="例如：中秋節、連假、無"></div><div><label>促銷活動</label><input id="slCampaign" placeholder="例如：會員日、滿額折扣、無"></div>
 </div><button data-act="sales">送出每日業績紀錄</button><div class="msg" id="slMsg"></div>
@@ -236,6 +243,11 @@ details{margin-top:8px}summary{cursor:pointer;color:#1e3a8a;font-size:13px}
 
 <div class="pane card" id="pane-docInbox">
 <h2>員工文件審核中心</h2><p class="sub">主管可檢視文件內容、核准或退件，並留下審核意見。</p><button class="gray small" data-act="docInbox">重新整理</button><div class="msg" id="diMsg"></div><div id="diOut"></div>
+</div>
+
+<div class="pane card" id="pane-grievances">
+<h2>員工申訴／回報管理</h2><p class="sub">僅高階主管可查看；請依制度、公平及保密原則處理，不得因提出申訴而不利對待員工。</p>
+<button class="gray small" data-act="grievances">重新整理</button><div class="msg" id="grMsg"></div><div id="grOut"></div>
 </div>
 
 <div class="pane card" id="pane-salesAnalysis">
@@ -256,10 +268,11 @@ function fmt(s){ if (!s) return '-'; var d = new Date(s); return isNaN(d.getTime
 function today(){ var d = new Date(); var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dd < 10 ? '0' : '') + dd; }
 
 var ROLES = {
-  employee: {name:'員工', tabs:[['profile','員工資料'],['work','工作回報'],['document','文件呈交'],['sales','每日業績'],['ops','回報營運狀況'],['photo','上傳班表照片'],['myscore','我的積分'],['appeal','積分申訴']]},
-  manager: {name:'主管', tabs:[['workInbox','工作審核中心'],['docInbox','文件審核中心'],['salesAnalysis','節慶天氣業績分析'],['inbox','既有待辦審核'],['dash','積分總覽'],['scoreevt','登錄積分事件'],['schedule','班表確認'],['ops','回報營運狀況']]}
+  employee: {name:'員工', tabs:[['work','工作回報'],['document','文件呈交'],['sales','每日業績'],['photo','上傳班表照片'],['myscore','我的積分'],['appeal','積分申訴／跨店支援']]},
+  manager: {name:'主管', tabs:[['profile','員工資料建立／更新'],['workInbox','工作審核中心'],['docInbox','文件審核中心'],['inbox','積分申訴／跨店支援審核'],['dash','積分總覽'],['scoreevt','登錄積分事件'],['schedule','班表確認'],['ops','回報營運狀況']]},
+  executive: {name:'高階主管', tabs:[['salesAnalysis','節慶／天氣業績分析'],['grievances','員工申訴回報']]}
 };
-var FIELDS = ['myId','myStore','hName','hValue','bUser','bPass'];
+var FIELDS = ['myId','myStore','hName','hValue','bUser','bPass','eUser','ePass'];
 var state = {role:null};
 
 var OPS_FIELDS = {
@@ -316,7 +329,8 @@ function login(){
   clearMsg('loginMsg');
   if (!state.role) { msg('loginMsg','err','請先選擇身分'); return; }
   if (!$('hName').value.trim() || !$('hValue').value) { msg('loginMsg','err','請輸入金鑰名稱與金鑰值'); return; }
-  if (state.role !== 'staff' && (!$('bUser').value || !$('bPass').value)) { msg('loginMsg','err','員工與主管需要輸入查詢帳號與密碼'); return; }
+  if (state.role !== 'staff' && state.role !== 'executive' && (!$('bUser').value || !$('bPass').value)) { msg('loginMsg','err','請輸入查詢帳號與密碼'); return; }
+  if (state.role === 'executive' && (!$('eUser').value || !$('ePass').value)) { msg('loginMsg','err','高階主管必須輸入專用帳號與密碼'); return; }
   FIELDS.forEach(function(k){ sSet('aomp_' + k, $(k).value); });
   sSet('aomp_role', state.role);
   enterApp();
@@ -336,7 +350,7 @@ function enterApp(){
   showTab(R.tabs[0][0]);
 }
 function logout(){
-  ['hValue','bPass'].forEach(function(k){ $(k).value = ''; sSet('aomp_' + k, ''); });
+  ['hValue','bPass','ePass'].forEach(function(k){ $(k).value = ''; sSet('aomp_' + k, ''); });
   $('app').classList.add('hide');
   $('login').classList.remove('hide');
   $('hdrBtns').classList.add('hide');
@@ -367,7 +381,8 @@ function prefill(){
 async function api(path, opt){
   opt = opt || {};
   var headers = {};
-  if (opt.auth === 'basic') headers['Authorization'] = 'Basic ' + btoa(unescape(encodeURIComponent($('bUser').value + ':' + $('bPass').value)));
+  if (opt.auth === 'executive') headers['Authorization'] = 'Basic ' + btoa(unescape(encodeURIComponent($('eUser').value + ':' + $('ePass').value)));
+  else if (opt.auth === 'basic') headers['Authorization'] = 'Basic ' + btoa(unescape(encodeURIComponent($('bUser').value + ':' + $('bPass').value)));
   else headers[$('hName').value.trim()] = $('hValue').value;
   var init = {method: opt.method || 'GET', headers: headers};
   if (opt.json !== undefined) { headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(opt.json); }
@@ -554,8 +569,58 @@ function setDefaultsV10(){
  [['pfId',id],['pfStore',st],['dcEmp',id],['wkStore',st],['slStore',st],['anStore',st]].forEach(function(x){if($(x[0])&&!$(x[0]).value)$(x[0]).value=x[1]||'';});
  if($('slDate')&&!$('slDate').value)$('slDate').value=today();
 }
+
+async function scanProfile(){
+ clearMsg('pfMsg');
+ var f=$('pfFile').files[0];
+ if(!f){msg('pfMsg','err','請先選擇員工資料圖片。');return;}
+ if(!f.type||!f.type.startsWith('image/')){msg('pfMsg','err','目前 OCR 僅支援 JPG、PNG、WEBP 等圖片；PDF 請先轉成圖片。');return;}
+ if(f.size>6000000){msg('pfMsg','err','圖片請控制在 6MB 以內。');return;}
+ msg('pfMsg','info','正在辨識員工資料，請稍候…');
+ var dataUrl=await new Promise(function(resolve,reject){var rd=new FileReader();rd.onload=function(){resolve(rd.result);};rd.onerror=reject;rd.readAsDataURL(f);});
+ var r=await api('aom-v12-employee-profile-ocr',{method:'POST',json:{image_data_url:dataUrl,mime_type:f.type}});
+ if(!r.ok){msg('pfMsg','err','辨識失敗：'+r.error);return;}
+ var x=r.data.fields||{};
+ if(x.employee_id)$('pfId').value=x.employee_id;
+ if(x.full_name)$('pfName').value=x.full_name;
+ if(x.address)$('pfAddress').value=x.address;
+ if(x.hire_date)$('pfHire').value=x.hire_date;
+ if(x.email)$('pfEmail').value=x.email;
+ if(x.phone)$('pfPhone').value=x.phone;
+ if(x.store_id)$('pfStore').value=x.store_id;
+ if(x.job_title)$('pfTitle').value=x.job_title;
+ var missing=(r.data.unreadable_fields||[]);
+ msg('pfMsg','ok','辨識完成，已帶入可辨識欄位。請逐項核對姓名、地址、到職日期、Email、電話後，再按「儲存／更新員工資料」。'+(missing.length?' 未辨識欄位：'+missing.join('、'):''));
+}
+
+
+async function doGrievance(){
+ clearMsg('grMsg');
+ var b={employee_id:$('myId').value.trim(),store_id:$('myStore').value.trim(),category:$('grCategory').value,confidential:$('grConfidential').value==='yes',description:$('grDescription').value.trim()};
+ if(!b.employee_id||b.description.length<10){msg('grMsg','err','請登入員工編號，申訴內容至少 10 個字。');return;}
+ var r=await api('aom-v12-employee-grievance',{method:'POST',json:b});
+ if(!r.ok){msg('grMsg','err',r.error);return;}
+ $('grDescription').value='';msg('grMsg','ok','申訴已送出，案件編號：'+r.data.grievance_id+'。高階主管將依權限查看。');
+}
+async function loadGrievances(){
+ clearMsg('grMsg');$('grOut').innerHTML='<p class="sub">載入中…</p>';
+ var r=await api('aom-v12-employee-grievance-inbox',{auth:'executive'});
+ if(!r.ok){$('grOut').innerHTML='';msg('grMsg','err',r.error);return;}
+ var rows=r.data.records||[];
+ $('grOut').innerHTML=rows.map(function(x){
+  return '<div class="item"><div class="t">'+esc(x.category)+'｜'+esc(x.status)+'</div><div class="sub">案件 '+esc(x.grievance_id)+'｜員工 '+(x.confidential?'（保密申訴）':esc(x.employee_id))+'｜門市 '+esc(x.store_id||'-')+'｜'+fmt(x.submitted_at)+'</div><p>'+esc(x.description)+'</p><textarea id="grNote_'+esc(x.grievance_id)+'" placeholder="處理紀錄／回覆意見">'+esc(x.review_note||'')+'</textarea><button class="small green" data-act="grievanceReview" data-id="'+esc(x.grievance_id)+'" data-d="resolved">標記已處理</button><button class="small gray" data-act="grievanceReview" data-id="'+esc(x.grievance_id)+'" data-d="investigating">調查中</button></div>';
+ }).join('')||'<p class="sub">目前沒有員工申訴回報。</p>';
+}
+async function reviewGrievance(btn){
+ var id=btn.getAttribute('data-id'),decision=btn.getAttribute('data-d'),note=$('grNote_'+id).value.trim();
+ if(!note){msg('grMsg','err','請填寫處理紀錄或回覆意見。');return;}
+ var r=await api('aom-v12-employee-grievance-review',{method:'POST',auth:'executive',json:{grievance_id:id,reviewer_id:$('myId').value.trim(),status:decision,review_note:note}});
+ if(!r.ok){msg('grMsg','err',r.error);return;}
+ await loadGrievances();msg('grMsg','ok','案件狀態已更新。');
+}
+
 async function doProfile(){
- clearMsg('pfMsg');var b={employee_id:$('pfId').value.trim(),full_name:$('pfName').value.trim(),store_id:$('pfStore').value.trim(),job_title:$('pfTitle').value.trim(),phone:$('pfPhone').value.trim(),email:$('pfEmail').value.trim(),hire_date:$('pfHire').value,status:$('pfStatus').value,notes:$('pfNotes').value.trim()};
+ clearMsg('pfMsg');var b={employee_id:$('pfId').value.trim(),full_name:$('pfName').value.trim(),store_id:$('pfStore').value.trim(),job_title:$('pfTitle').value.trim(),address:$('pfAddress').value.trim(),phone:$('pfPhone').value.trim(),email:$('pfEmail').value.trim(),hire_date:$('pfHire').value,status:$('pfStatus').value,notes:$('pfNotes').value.trim()};
  if(!b.employee_id||!b.full_name){msg('pfMsg','err','員工編號與姓名為必填。');return;}
  var r=await api('aom-v07-employee-profile',{method:'POST',json:b});if(!r.ok){msg('pfMsg','err',r.error);return;}
  var f=$('pfFile').files[0];
@@ -564,8 +629,8 @@ async function doProfile(){
   var dataUrl=await new Promise(function(resolve,reject){var rd=new FileReader();rd.onload=function(){resolve(rd.result)};rd.onerror=reject;rd.readAsDataURL(f);});
   var dr=await api('aom-v07-employee-document-submit',{method:'POST',json:{employee_id:b.employee_id,document_type:'employee_profile_scan',title:'員工資料掃描檔｜'+f.name,content:dataUrl,file_name:f.name,mime_type:f.type||'application/octet-stream'}});
   if(!dr.ok){msg('pfMsg','err','基本資料已儲存，但掃描檔呈交失敗：'+dr.error);return;}
-  msg('pfMsg','ok','員工資料已建立／更新，掃描檔已呈交主管審核。');
- }else msg('pfMsg','ok','員工資料已建立／更新：'+b.employee_id+'（未附掃描檔）');
+  msg('pfMsg','ok','員工資料已建立／更新，掃描檔已存入主管文件審核中心。');
+ }else msg('pfMsg','ok','員工資料已建立／更新：'+b.employee_id);
 }
 async function doWork(){
  clearMsg('wkMsg');var module=$('wkModule').value,title=$('wkTitle').value.trim(),employee_id=$('myId').value.trim(),store_id=$('wkStore').value.trim();
@@ -584,7 +649,7 @@ async function doDocument(){
 async function doSales(){
  clearMsg('slMsg');var emp=$('myId').value.trim(),store=$('slStore').value.trim(),sales=Number($('slAmount').value),date=$('slDate').value;
  if(!emp||!store||!date||$('slAmount').value===''||!Number.isFinite(sales)||sales<0){msg('slMsg','err','請填寫員工編號、門市、日期及有效營業額。');return;}
- var p={date:date, sales:sales, weather:$('slWeather').value, festival:$('slFestival').value.trim()||'無',campaign:$('slCampaign').value.trim()||'無'};
+ var p={date:date, sales:sales, weather:$('slWeather').value.trim()||'unknown', festival:$('slFestival').value.trim()||'無',campaign:$('slCampaign').value.trim()||'無'};
  var r=await api('aom-v09-record-submit',{method:'POST',json:{module:'sales_daily',employee_id:emp,store_id:store,title:'每日營業額 '+date,payload:p}});
  if(!r.ok){msg('slMsg','err',r.error);return;}msg('slMsg','ok','每日業績已記錄，編號：'+(r.data.record_id||'已建立'));$('slAmount').value='';
 }
@@ -635,7 +700,7 @@ async function reviewV10Doc(btn){
  var r=await api('aom-v07-document-review',{method:'POST',json:{document_id:id,reviewer_id:reviewer,decision:decision,review_note:note}});if(!r.ok){msg('diMsg','err',r.error);return;}await loadV10DocInbox();msg('diMsg','ok','文件審核完成。');
 }
 async function loadV10SalesAnalysis(){
- clearMsg('anMsg');$('anOut').innerHTML='<p class="sub">分析中…</p>';var st=$('anStore').value.trim(),q=st?'store_id='+encodeURIComponent(st):'';var r=await api('aom-v09-sales-analysis',{query:q});if(!r.ok){$('anOut').innerHTML='';msg('anMsg','err',r.error);return;}
+ clearMsg('anMsg');$('anOut').innerHTML='<p class="sub">分析中…</p>';var st=$('anStore').value.trim(),q=st?'store_id='+encodeURIComponent(st):'';var r=await api('aom-v09-sales-analysis',{query:q,auth:'executive'});if(!r.ok){$('anOut').innerHTML='';msg('anMsg','err',r.error);return;}
  var d=r.data||{},f=d.factor_comparisons||[];var latest=d.latest_record||{};
  var factors=f.map(function(x){return '<tr><td>'+esc(x.factor)+'</td><td>'+esc(x.with_factor_count)+'</td><td>'+esc(x.with_factor_avg)+'</td><td>'+esc(x.without_factor_count)+'</td><td>'+esc(x.without_factor_avg)+'</td><td>'+(x.difference_percent===null?'資料不足':esc(x.difference_percent)+'%')+'</td></tr>';}).join('');
  var rec=(d.recommendations||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
@@ -662,7 +727,8 @@ document.addEventListener('click', function(ev){
   if (a === 'decide') { busyRun(function(){ return decide(el); }, el); return; }
   if (a === 'v9review') { busyRun(function(){ return reviewV10Record(el); }, el); return; }
   if (a === 'docreview') { busyRun(function(){ return reviewV10Doc(el); }, el); return; }
-  var map = {ops:doOps, photo:doPhoto, myscore:doMyScore, appeal:doAppeal, support:doSupport, supportStats:loadSupportStats, inbox:loadInbox, dash:loadDash, scoreevt:doScoreEvt, schedule:doSchedule, profile:doProfile, work:doWork, document:doDocument, sales:doSales, workInbox:loadV10WorkInbox, docInbox:loadV10DocInbox, salesAnalysis:loadV10SalesAnalysis};
+   if (a === 'grievanceReview') { busyRun(function(){ return reviewGrievance(el); }, el); return; }
+  var map = {ops:doOps, photo:doPhoto, myscore:doMyScore, appeal:doAppeal, support:doSupport, supportStats:loadSupportStats, inbox:loadInbox, dash:loadDash, scoreevt:doScoreEvt, schedule:doSchedule, profile:doProfile, scanProfile:scanProfile, grievance:doGrievance, grievances:loadGrievances, work:doWork, document:doDocument, sales:doSales, workInbox:loadV10WorkInbox, docInbox:loadV10DocInbox, salesAnalysis:loadV10SalesAnalysis};
   if (map[a]) busyRun(map[a], el);
 });
 
