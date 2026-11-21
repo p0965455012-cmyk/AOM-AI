@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AOM 2.0 數據測試控制台</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; padding: 16px; max-width: 650px; margin: auto; background: #f5f5f7; color: #1d1d1f; }
+    .card { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    h2 { margin-top: 0; font-size: 20px; }
+    h3 { font-size: 15px; margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 1px solid #e5e5ea; color: #007aff; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label { display: block; margin-top: 10px; font-weight: 600; font-size: 13px; color: #3a3a3c; }
+    input, select, textarea { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #d1d1d6; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+    button { margin-top: 20px; width: 100%; padding: 14px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:active { background: #005bb5; }
+    pre { background: #1e1e1e; color: #4af626; padding: 15px; border-radius: 10px; overflow-x: auto; font-size: 13px; margin-top: 18px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>AOM 2.0 營運數據測試控制台</h2>
+    
+    <h3>1. 基礎識別資訊</h3>
+    <div class="grid">
+      <div>
+        <label>租戶代碼 (tenant_id)</label>
+        <input type="text" id="tenant_id" value="STORE001">
+      </div>
+      <div>
+        <label>分店代碼 (store_id)</label>
+        <input type="text" id="store_id" value="BRANCH001">
+      </div>
+      <div>
+        <label>模組代碼 (module_id)</label>
+        <input type="text" id="module_id" value="M01">
+      </div>
+      <div>
+        <label>操作者 (requested_by)</label>
+        <input type="text" id="requested_by" value="admin">
+      </div>
+    </div>
+
+    <label>事件類型 (event_type)</label>
+    <select id="event_type">
+      <option value="query">query (營運數據查詢分析)</option>
+      <option value="action">action (執行調整動作)</option>
+      <option value="alert">alert (異常高風險通報)</option>
+    </select>
+
+    <h3>2. 營運數值測試資料 (Payload)</h3>
+    <div class="grid">
+      <div>
+        <label>今日實際營收 (元)</label>
+        <input type="number" id="revenue" value="42000">
+      </div>
+      <div>
+        <label>今日目標營收 (元)</label>
+        <input type="number" id="target_revenue" value="50000">
+      </div>
+      <div>
+        <label>核心商品庫存量 (件)</label>
+        <input type="number" id="inventory" value="8">
+      </div>
+      <div>
+        <label>安全庫存警戒線 (件)</label>
+        <input type="number" id="safety_stock" value="15">
+      </div>
+    </div>
+
+    <label>分析問題或備註 (question)</label>
+    <textarea id="question" rows="2">請分析今日營收達成率與庫存異常狀況</textarea>
+
+    <label>額外自訂 JSON 資料 (選填，可自由新增其他欄位)</label>
+    <textarea id="extra_json" rows="2">{"promo_active": true, "weather": "rainy"}</textarea>
+
+    <button onclick="sendTest()">發送數據進行分析</button>
+    <pre id="result">等待發送測試數據...</pre>
+  </div>
+
+  <script>
+    async function sendTest() {
+      const resultBox = document.getElementById('result');
+      resultBox.textContent = '正在傳送數據至 n8n 分析...';
+      const targetUrl = 'https:' + '//learning.n8n.tw/webhook/aom-central';
+
+      let extraData = {};
+      const extraText = document.getElementById('extra_json').value.trim();
+      if (extraText) {
+        try {
+          extraData = JSON.parse(extraText);
+        } catch (e) {
+          resultBox.textContent = '錯誤：「額外自訂 JSON 資料」格式不正確，請檢查大括號與雙引號。';
+          return;
+        }
+      }
+
+      const data = {
+        tenant_id: document.getElementById('tenant_id').value,
+        store_id: document.getElementById('store_id').value,
+        module_id: document.getElementById('module_id').value,
+        event_type: document.getElementById('event_type').value,
+        requested_by: document.getElementById('requested_by').value,
+        payload: {
+          question: document.getElementById('question').value,
+          metrics: {
+            revenue: Number(document.getElementById('revenue').value),
+            target_revenue: Number(document.getElementById('target_revenue').value),
+            inventory: Number(document.getElementById('inventory').value),
+            safety_stock: Number(document.getElementById('safety_stock').value)
+          },
+          ...extraData
+        }
+      };
+
+      try {
+        const response = await fetch(targetUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+          body: JSON.stringify(data)
+        });
+        const text = await response.text();
+        try {
+          resultBox.textContent = JSON.stringify(JSON.parse(text), null, 2);
+        } catch {
+          resultBox.textContent = text;
+        }
+      } catch (err) {
+        resultBox.textContent = '發送失敗：' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
